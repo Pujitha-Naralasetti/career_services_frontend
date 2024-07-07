@@ -5,17 +5,16 @@ import { useRouter } from "vue-router";
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 import UserServices from "../services/UserServices.js";
+import { useGlobalStore } from "../stores/globalStore.js";
+import { storeToRefs } from "pinia";
 
 const router = useRouter();
 const isCreateAccount = ref(false);
-// const userRole = ref("student");
 const emailInValid = ref(false);
 const genders = ref(["Male", "Female"]);
-const snackbar = ref({
-  value: false,
-  color: "",
-  text: "",
-});
+
+const globalStore = useGlobalStore();
+const { snackBar, userInfo } = storeToRefs(globalStore);
 const user = ref({
   firstName: "",
   lastName: "",
@@ -39,9 +38,11 @@ async function createAccount() {
   await UserServices.addUser(user.value)
     .then(() => {
       emailInValid.value = false;
-      snackbar.value.value = true;
-      snackbar.value.color = "green";
-      snackbar.value.text = "Account created successfully!";
+      snackBar.value = {
+        value: true,
+        color: "green",
+        text: "Account created successfully!",
+      }
       isCreateAccount.value = false;
       user.value = {
         firstName: "",
@@ -59,19 +60,24 @@ async function createAccount() {
     })
     .catch((error) => {
       console.log(error);
-      snackbar.value.value = true;
-      snackbar.value.color = "error";
-      snackbar.value.text = error.response.data.message;
+      snackBar.value = {
+        value: true,
+        color: "error",
+        text: error.response.data.message,
+      }
     });
 }
 
 async function login() {
   await UserServices.loginUser(user)
     .then((data) => {
+      userInfo.value = data.data;
       window.localStorage.setItem("user", JSON.stringify(data.data));
-      snackbar.value.value = true;
-      snackbar.value.color = "green";
-      snackbar.value.text = "Login successful!";
+      snackBar.value = {
+        value: true,
+        color: "green",
+        text: "Login successful!",
+      }
       user.value = {
         firstName: "",
         lastName: "",
@@ -88,9 +94,11 @@ async function login() {
     })
     .catch((error) => {
       console.log(error);
-      snackbar.value.value = true;
-      snackbar.value.color = "error";
-      snackbar.value.text = error.response.data.message;
+      snackBar.value = {
+        value: true,
+        color: "error",
+        text: error.response.data.message,
+      }
     });
 }
 
@@ -126,10 +134,6 @@ function closeCreateAccount() {
     address: "",
     dateOfBirth: null,
   };
-}
-
-function closeSnackBar() {
-  snackbar.value.value = false;
 }
 
 function onEmailChange() {
@@ -224,16 +228,6 @@ function onEmailChange() {
           </v-card-actions>
         </v-card>
       </v-dialog>
-
-      <v-snackbar v-model="snackbar.value" rounded="pill">
-        {{ snackbar.text }}
-
-        <template v-slot:actions>
-          <v-btn :color="snackbar.color" variant="text" @click="closeSnackBar()">
-            Close
-          </v-btn>
-        </template>
-      </v-snackbar>
     </div>
   </v-container>
 </template>
