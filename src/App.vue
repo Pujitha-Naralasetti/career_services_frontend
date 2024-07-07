@@ -1,11 +1,40 @@
 <script setup>
+import { storeToRefs } from "pinia";
 import MenuBar from "./components/MenuBar.vue";
 import careerServicesBG from "./images/career-bg.jpeg";
+import { useGlobalStore } from "./stores/globalStore";
+import { onMounted, ref } from "vue";
+
+
+const globalStore = useGlobalStore();
+const { snackBar, userInfo } = storeToRefs(globalStore);
+
+const user = ref({
+  firstName: "",
+  lastName: "",
+  phone: "",
+  email: "",
+  password: "",
+  gender: "",
+  roleId: null,
+  nationality: "",
+  address: "",
+  dateOfBirth: null,
+});
+
+onMounted(async () => {
+  user.value = JSON.parse(localStorage.getItem("user"));
+  userInfo.value = user.value;
+});
+
+const closeSnackBar = () => {
+  snackBar.value = { value: false, color: "", text: "" }
+}
 </script>
 
 <template>
   <v-app :style="{
-    'background-image': `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+    'background-image': `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
                   url(${careerServicesBG})`,
     'background-position': 'center',
     'background-repeat': 'no-repeat',
@@ -17,4 +46,12 @@ import careerServicesBG from "./images/career-bg.jpeg";
       <router-view />
     </v-main>
   </v-app>
+  <v-snackbar v-model="snackBar.value" rounded="pill" :timeout="3000">
+    {{ snackBar.text }}
+    <template v-slot:actions>
+      <v-btn :color="snackBar.color" variant="text" @click="closeSnackBar">
+        Close
+      </v-btn>
+    </template>
+  </v-snackbar>
 </template>
