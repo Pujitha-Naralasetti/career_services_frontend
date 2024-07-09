@@ -17,6 +17,8 @@ const isEditProfile = ref(false);
 const showDeleteConf = ref(false);
 const emailInValid = ref(false);
 const user = ref({
+    id: "",
+    roleId: "",
     firstName: "",
     lastName: "",
     phone: "",
@@ -28,7 +30,6 @@ const user = ref({
 });
 
 onMounted(async () => {
-    // const loggedInUser = JSON.parse(localStorage.getItem("user"));
     await getUser(userInfo.value?.id);
 });
 
@@ -39,6 +40,7 @@ async function getUser(userId) {
             isEditProfile.value = false;
             user.value = {
                 id: response?.data?.id,
+                roleId: response?.data?.roleId,
                 firstName: response?.data?.firstName,
                 lastName: response?.data?.lastName,
                 phone: response?.data?.phone,
@@ -166,24 +168,31 @@ function closeDeletePopup() {
 </script>
 <template>
     <v-container>
-        <v-card class="rounded-lg elevation-5" color="#232323" dark>
+        <v-row align="center" justify="space-between">
+            <v-col cols="auto">
+                <p class="text-h4">
+                    Profile
+                </p>
+            </v-col>
+            <v-col cols="auto">
+                <v-btn class="mr-3" variant="flat" color="secondary" :to="{ name: 'dashboard' }">Back</v-btn>
+            </v-col>
+        </v-row>
+        <v-card class="mt-3 rounded-lg elevation-5" color="#232323" dark>
             <v-card-title>
                 <v-row align="center" justify="space-between">
                     <v-col cols="auto">
-                        <p class="text-h4">
-                            Profile
+                        <p class="text-h5 font-italic">
+                            Personal Info:
                         </p>
                     </v-col>
                     <v-col cols="auto">
-                        <v-btn class="mr-3" variant="flat" color="secondary" :to="{ name: 'dashboard' }">Back</v-btn>
-                        <v-btn color="primary" @click="openEditProfile">Edit</v-btn>
+                        <v-btn class="ma-2" color="black" size="x-small" icon="mdi-pencil"
+                            @click="openEditProfile"></v-btn>
                     </v-col>
                 </v-row>
             </v-card-title>
             <v-card-text>
-                <p class="mt-5 text-h5 font-italic">
-                    Personal Info:
-                </p>
                 <v-row class="mt-1 mx-15" align="center" justify="center">
                     <v-col cols="6">
                         <p><b>First Name: </b>{{ user.firstName }}</p>
@@ -210,47 +219,117 @@ function closeDeletePopup() {
                         <p><b>Address: </b>{{ user.address }}</p>
                     </v-col>
                 </v-row>
-                <p class="mt-10 text-h5 font-italic">
-                    Education:
-                </p>
-                <v-row class="mt-1" align="center" justify="center">
-                </v-row>
-                <p class="mt-10 text-h5 font-italic">
-                    Certifications:
-                </p>
-                <v-row class="mt-1" align="center" justify="center">
-                </v-row>
-                <p class="mt-10 text-h5 font-italic">
-                    Skills:
-                </p>
-                <v-row class="mt-1" align="center" justify="center">
-                </v-row>
-                <p class="mt-10 text-h5 font-italic">
-                    Awards & Achievements:
-                </p>
-                <v-row class="mt-1" align="center" justify="center">
-                </v-row>
-                <p class="mt-10 text-h5 font-italic">
-                    Experience:
-                </p>
-                <v-row class="mt-1" align="center" justify="center">
-                </v-row>
-                <p class="mt-10 text-h5 font-italic">
-                    Projects:
-                </p>
-                <v-row class="mt-1" align="center" justify="center">
-                </v-row>
             </v-card-text>
-            <v-card-actions>
-                <v-row align="center" justify="center">
+        </v-card>
+
+        <v-card v-if="user.roleId == 1" class="mt-3 rounded-lg elevation-5" color="#232323" dark>
+            <v-card-title>
+                <v-row align="center" justify="space-between">
                     <v-col cols="auto">
-                        <v-btn variant="flat" color="red" @click="(e) => openDeletePopup(e)"
-                            :disabled="!user?.id">Deactivate
-                            Account</v-btn>
+                        <p class="text-h5 font-italic">
+                            Education:
+                        </p>
+                    </v-col>
+                    <v-col cols="auto">
+                        <v-btn class="ma-2" color="black" size="x-small" icon="mdi-pencil"></v-btn>
                     </v-col>
                 </v-row>
-            </v-card-actions>
+            </v-card-title>
+            <v-card-text>
+                <v-row class="mt-1" align="center" justify="center"></v-row>
+            </v-card-text>
         </v-card>
+        <v-card v-if="user.roleId == 1" class="mt-3 rounded-lg elevation-5" color="#232323" dark>
+            <v-card-title>
+                <v-row align="center" justify="space-between">
+                    <v-col cols="auto">
+                        <p class="text-h5 font-italic">
+                            Certifications:
+                        </p>
+                    </v-col>
+                    <v-col cols="auto">
+                        <v-btn class="ma-2" color="black" size="x-small" icon="mdi-pencil"></v-btn>
+                    </v-col>
+                </v-row>
+            </v-card-title>
+            <v-card-text>
+                <v-row class="mt-1" align="center" justify="center"></v-row>
+            </v-card-text>
+        </v-card>
+        <v-card v-if="user.roleId == 1" class="mt-3 rounded-lg elevation-5" color="#232323" dark>
+            <v-card-title>
+                <v-row align="center" justify="space-between">
+                    <v-col cols="auto">
+                        <p class="text-h5 font-italic">
+                            Skills:
+                        </p>
+                    </v-col>
+                    <v-col cols="auto">
+                        <v-btn class="ma-2" color="black" size="x-small" icon="mdi-pencil"></v-btn>
+                    </v-col>
+                </v-row>
+            </v-card-title>
+            <v-card-text>
+                <v-row class="mt-1" align="center" justify="center"></v-row>
+            </v-card-text>
+        </v-card>
+        <v-card v-if="user.roleId == 1" class="mt-3 rounded-lg elevation-5" color="#232323" dark>
+            <v-card-title>
+                <v-row align="center" justify="space-between">
+                    <v-col cols="auto">
+                        <p class="text-h5 font-italic">
+                            Awards & Achievements:
+                        </p>
+                    </v-col>
+                    <v-col cols="auto">
+                        <v-btn class="ma-2" color="black" size="x-small" icon="mdi-pencil"></v-btn>
+                    </v-col>
+                </v-row>
+            </v-card-title>
+            <v-card-text>
+                <v-row class="mt-1" align="center" justify="center"></v-row>
+            </v-card-text>
+        </v-card>
+        <v-card v-if="user.roleId == 1" class="mt-3 rounded-lg elevation-5" color="#232323" dark>
+            <v-card-title>
+                <v-row align="center" justify="space-between">
+                    <v-col cols="auto">
+                        <p class="text-h5 font-italic">
+                            Experience:
+                        </p>
+                    </v-col>
+                    <v-col cols="auto">
+                        <v-btn class="ma-2" color="black" size="x-small" icon="mdi-pencil"></v-btn>
+                    </v-col>
+                </v-row>
+            </v-card-title>
+            <v-card-text>
+                <v-row class="mt-1" align="center" justify="center"></v-row>
+            </v-card-text>
+        </v-card>
+        <v-card v-if="user.roleId == 1" class="mt-3 rounded-lg elevation-5" color="#232323" dark>
+            <v-card-title>
+                <v-row align="center" justify="space-between">
+                    <v-col cols="auto">
+                        <p class="text-h5 font-italic">
+                            Projects:
+                        </p>
+                    </v-col>
+                    <v-col cols="auto">
+                        <v-btn class="ma-2" color="black" size="x-small" icon="mdi-pencil"></v-btn>
+                    </v-col>
+                </v-row>
+            </v-card-title>
+            <v-card-text>
+                <v-row class="mt-1" align="center" justify="center"></v-row>
+            </v-card-text>
+        </v-card>
+        <v-row class="mt-4" align="center" justify="center">
+            <v-col cols="auto">
+                <v-btn variant="flat" color="red" @click="(e) => openDeletePopup(e)" :disabled="!user?.id">Deactivate
+                    Account</v-btn>
+            </v-col>
+        </v-row>
     </v-container>
     <v-dialog persistent v-model="isEditProfile" width="700">
         <v-card color="#232323" class="rounded-lg elevation-5">
@@ -284,14 +363,14 @@ function closeDeletePopup() {
                 <v-spacer></v-spacer>
                 <v-btn @click="closeEditProfile()">Close</v-btn>
                 <v-btn variant="outlined" :disabled="emailInValid ||
-                            !user.email ||
-                            !user.phone ||
-                            !user.nationality ||
-                            !user.gender ||
-                            !user.dateOfBirth ||
-                            !user.firstName ||
-                            !user.address ||
-                            !user.lastName" @click="updateUser()">Update Profile</v-btn>
+                    !user.email ||
+                    !user.phone ||
+                    !user.nationality ||
+                    !user.gender ||
+                    !user.dateOfBirth ||
+                    !user.firstName ||
+                    !user.address ||
+                    !user.lastName" @click="updateUser()">Update Profile</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
