@@ -24,6 +24,9 @@ const user = ref({
 
 onMounted(async () => {
   user.value = JSON.parse(localStorage.getItem("user"));
+  if (!user.value) {
+    router.push({ name: "login" });
+  }
   userInfo.value = user.value;
 });
 
