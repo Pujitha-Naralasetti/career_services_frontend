@@ -2,27 +2,35 @@
 import { onMounted } from "vue";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
 import UserServices from "../services/UserServices.js";
+import { useGlobalStore } from "../stores/globalStore.js";
+import { storeToRefs } from "pinia";
 
 const router = useRouter();
 const isCreateAccount = ref(false);
-const loginType = ref("user");
 const emailInValid = ref(false);
-const snackbar = ref({
-  value: false,
-  color: "",
-  text: "",
-});
+const genders = ref(["Male", "Female"]);
+
+const globalStore = useGlobalStore();
+const { snackBar, userInfo } = storeToRefs(globalStore);
 const user = ref({
   firstName: "",
   lastName: "",
+  phone: "",
   email: "",
   password: "",
+  gender: "",
+  roleId: null,
+  nationality: "",
+  address: "",
+  dateOfBirth: null,
 });
 
 onMounted(async () => {
   if (localStorage.getItem("user") !== null) {
-    // router.push({ name: "stories" });
+    router.push({ name: "dashboard" });
   }
 });
 
@@ -30,46 +38,67 @@ async function createAccount() {
   await UserServices.addUser(user.value)
     .then(() => {
       emailInValid.value = false;
-      snackbar.value.value = true;
-      snackbar.value.color = "green";
-      snackbar.value.text = "Account created successfully!";
+      snackBar.value = {
+        value: true,
+        color: "green",
+        text: "Account created successfully!",
+      }
       isCreateAccount.value = false;
       user.value = {
         firstName: "",
         lastName: "",
+        phone: "",
         email: "",
         password: "",
+        gender: "",
+        roleId: null,
+        nationality: "",
+        address: "",
+        dateOfBirth: null,
       };
       router.push({ name: "login" });
     })
     .catch((error) => {
       console.log(error);
-      snackbar.value.value = true;
-      snackbar.value.color = "error";
-      snackbar.value.text = error.response.data.message;
+      snackBar.value = {
+        value: true,
+        color: "error",
+        text: error.response.data.message,
+      }
     });
 }
 
 async function login() {
   await UserServices.loginUser(user)
     .then((data) => {
+      userInfo.value = data.data;
       window.localStorage.setItem("user", JSON.stringify(data.data));
-      snackbar.value.value = true;
-      snackbar.value.color = "green";
-      snackbar.value.text = "Login successful!";
+      snackBar.value = {
+        value: true,
+        color: "green",
+        text: "Login successful!",
+      }
       user.value = {
         firstName: "",
         lastName: "",
+        phone: "",
         email: "",
         password: "",
+        gender: "",
+        roleId: null,
+        nationality: "",
+        address: "",
+        dateOfBirth: null,
       };
-      //router.push({ name: "stories" });
+      router.push({ name: "dashboard" });
     })
     .catch((error) => {
       console.log(error);
-      snackbar.value.value = true;
-      snackbar.value.color = "error";
-      snackbar.value.text = error.response.data.message;
+      snackBar.value = {
+        value: true,
+        color: "error",
+        text: error.response.data.message,
+      }
     });
 }
 
@@ -79,8 +108,14 @@ function openCreateAccount() {
   user.value = {
     firstName: "",
     lastName: "",
+    phone: "",
     email: "",
     password: "",
+    gender: "",
+    roleId: null,
+    nationality: "",
+    address: "",
+    dateOfBirth: null,
   };
 }
 
@@ -90,13 +125,15 @@ function closeCreateAccount() {
   user.value = {
     firstName: "",
     lastName: "",
+    phone: "",
     email: "",
     password: "",
+    gender: "",
+    roleId: null,
+    nationality: "",
+    address: "",
+    dateOfBirth: null,
   };
-}
-
-function closeSnackBar() {
-  snackbar.value.value = false;
 }
 
 function onEmailChange() {
@@ -120,11 +157,10 @@ function onEmailChange() {
         <v-card-text>
           <v-text-field v-model="user.email" label="Email*" :hint="emailInValid && 'Please enter valid email'"
             @input="onEmailChange" required></v-text-field>
-
           <v-text-field v-model="user.password" label="Password*" type="password" required></v-text-field>
         </v-card-text>
         <v-card-actions>
-          <v-btn v-if="loginType == 'user'" variant="outlined" @click="openCreateAccount()">Create
+          <v-btn variant="outlined" @click="openCreateAccount()">Create
             Account</v-btn>
           <v-spacer></v-spacer>
           <v-btn variant="outlined" :disabled="emailInValid || !user.email || !user.password"
@@ -132,18 +168,48 @@ function onEmailChange() {
         </v-card-actions>
       </v-card>
 
-      <v-dialog persistent v-model="isCreateAccount" width="700">
+      <v-dialog persistent v-model="isCreateAccount" width="900">
         <v-card color="#232323" class="rounded-lg elevation-5">
-          <v-card-title class="headline mb-2">Create User Account</v-card-title>
+          <v-card-title class="headline mb-2">Create Account</v-card-title>
           <v-card-text>
-            <v-text-field v-model="user.firstName" label="First Name*" required></v-text-field>
-
-            <v-text-field v-model="user.lastName" label="Last Name*" required></v-text-field>
-
-            <v-text-field v-model="user.email" label="Email*" :hint="emailInValid && 'Please enter valid email'"
-              @input="onEmailChange" required></v-text-field>
-
-            <v-text-field v-model="user.password" label="Password*" required type="password"></v-text-field>
+            <v-row align="center">
+              <v-col cols="6">
+                <v-text-field v-model="user.firstName" label="First Name*" required></v-text-field>
+              </v-col>
+              <v-col cols="6">
+                <v-text-field v-model="user.lastName" label="Last Name*" required></v-text-field>
+              </v-col>
+              <v-col cols="6">
+                <v-text-field v-model="user.phone" label="Phone*" required></v-text-field>
+              </v-col>
+              <v-col cols="6">
+                <v-text-field v-model="user.email" label="Email*" :hint="emailInValid && 'Please enter valid email'"
+                  @input="onEmailChange" required></v-text-field>
+              </v-col>
+              <v-col cols="6">
+                <v-text-field v-model="user.password" label="Password*" required type="password"></v-text-field>
+              </v-col>
+              <v-col cols="6">
+                <v-text-field v-model="user.nationality" label="Nationality*" required></v-text-field>
+              </v-col>
+              <v-col cols="6">
+                <v-select :items="genders" label="Gender*" v-model="user.gender" required></v-select>
+              </v-col>
+              <v-col cols="6">
+                <VueDatePicker v-model="user.dateOfBirth" :enable-time-picker="false" color="#232323"
+                  placeholder="Select DOB*" dark>
+                </VueDatePicker>
+              </v-col>
+              <v-col cols="6">
+                <v-textarea v-model="user.address" label="Address*" rows="3" outlined></v-textarea>
+              </v-col>
+              <v-col cols="6">
+                <v-radio-group v-model="user.roleId" inline label="Select Role*">
+                  <v-radio label="Student" value="1"></v-radio>
+                  <v-radio label="Staff" value="2"></v-radio>
+                </v-radio-group>
+              </v-col>
+            </v-row>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -151,21 +217,17 @@ function onEmailChange() {
             <v-btn variant="outlined" :disabled="emailInValid ||
             !user.email ||
             !user.password ||
+            !user.phone ||
+            !user.nationality ||
+            !user.gender ||
+            !user.dateOfBirth ||
+            !user.roleId ||
             !user.firstName ||
+            !user.address ||
             !user.lastName" @click="createAccount()">Create Account</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
-
-      <v-snackbar v-model="snackbar.value" rounded="pill">
-        {{ snackbar.text }}
-
-        <template v-slot:actions>
-          <v-btn :color="snackbar.color" variant="text" @click="closeSnackBar()">
-            Close
-          </v-btn>
-        </template>
-      </v-snackbar>
     </div>
   </v-container>
 </template>
