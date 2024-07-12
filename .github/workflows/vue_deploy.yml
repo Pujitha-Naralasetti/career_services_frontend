@@ -33,4 +33,4 @@ jobs:
           SOURCE: "dist/"
           REMOTE_HOST: ${{ secrets.AWS_PUBLIC_DNS }}
           REMOTE_USER: ubuntu
-          TARGET: "/var/www/html/career-frontend"
+          TARGET: "/var/www/html/career-services-frontend"
