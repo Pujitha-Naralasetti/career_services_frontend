@@ -4,10 +4,11 @@ import MenuBar from "./components/MenuBar.vue";
 import careerServicesBG from "./images/career-bg.jpeg";
 import { useGlobalStore } from "./stores/globalStore";
 import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 
-
+const router = useRouter();
 const globalStore = useGlobalStore();
-const { snackBar, userInfo } = storeToRefs(globalStore);
+const { snackBar, userInfo, progressBar } = storeToRefs(globalStore);
 
 const user = ref({
   firstName: "",
@@ -46,6 +47,7 @@ const closeSnackBar = () => {
   }">
     <MenuBar :key="$route.fullPath" />
     <v-main>
+      <v-progress-linear v-if="progressBar" height="4" indeterminate rounded></v-progress-linear>
       <router-view />
     </v-main>
   </v-app>

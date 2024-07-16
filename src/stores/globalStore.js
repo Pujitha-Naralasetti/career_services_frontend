@@ -7,6 +7,8 @@ export const useGlobalStore = defineStore("dataStore", () => {
     color: "",
     text: "",
   });
+  
+  const progressBar = ref(false);
 
   const userInfo = ref({
     firstName: "",
@@ -21,5 +23,5 @@ export const useGlobalStore = defineStore("dataStore", () => {
     dateOfBirth: null,
   });
 
-  return { snackBar, userInfo };
+  return { snackBar, userInfo, progressBar };
 });
