@@ -13,6 +13,10 @@ const isCreateAccount = ref(false);
 const emailInValid = ref(false);
 const genders = ref(["Male", "Female"]);
 
+const props = defineProps({
+  onLogin: Function,
+});
+
 const globalStore = useGlobalStore();
 const { snackBar, userInfo } = storeToRefs(globalStore);
 const user = ref({
@@ -91,6 +95,7 @@ async function login() {
         dateOfBirth: null,
       };
       router.push({ name: "dashboard" });
+      props.onLogin();
     })
     .catch((error) => {
       console.log(error);
@@ -215,16 +220,16 @@ function onEmailChange() {
             <v-spacer></v-spacer>
             <v-btn @click="closeCreateAccount()">Close</v-btn>
             <v-btn variant="outlined" :disabled="emailInValid ||
-            !user.email ||
-            !user.password ||
-            !user.phone ||
-            !user.nationality ||
-            !user.gender ||
-            !user.dateOfBirth ||
-            !user.roleId ||
-            !user.firstName ||
-            !user.address ||
-            !user.lastName" @click="createAccount()">Create Account</v-btn>
+              !user.email ||
+              !user.password ||
+              !user.phone ||
+              !user.nationality ||
+              !user.gender ||
+              !user.dateOfBirth ||
+              !user.roleId ||
+              !user.firstName ||
+              !user.address ||
+              !user.lastName" @click="createAccount()">Create Account</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
