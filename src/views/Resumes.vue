@@ -4,13 +4,14 @@ import { ref } from "vue";
 import { useGlobalStore } from "../stores/globalStore";
 import { storeToRefs } from "pinia";
 import ResumeServices from "../services/ResumeServices";
+import ResumeCard from "../components/ResumeCard.vue";
 
 const globalStore = useGlobalStore();
 const { snackBar, userInfo } = storeToRefs(globalStore);
 const resumes = ref([]);
 
 onMounted(async () => {
-  // await getResumes();
+  await getResumes();
 });
 
 async function getResumes() {
@@ -39,12 +40,13 @@ async function getResumes() {
         <v-col cols="10"><v-card-title class="pl-0 text-h4 font-weight-bold">Resumes
           </v-card-title>
         </v-col>
-        <v-col class="d-flex justify-end" cols="2">
+        <v-col v-if="userInfo?.roleId == 1" class="d-flex justify-end" cols="2">
           <v-btn color="accent" :to="{ name: 'generateResume' }">Generate Resume</v-btn>
         </v-col>
       </v-row>
       <template v-if="resumes?.length > 0">
-        <ResumeCardComponent v-for="resume in resumes" :key="resume.id" :resume="resume" />
+        <ResumeCard v-for="(resume, pos) in resumes" :resumeNumber="pos" :key="resume.id" :resume="resume"
+          :getUpdatedResumes="getResumes" />
       </template>
       <template v-else>
         <p class="font-italic text-center">No Resumes found...</p>
