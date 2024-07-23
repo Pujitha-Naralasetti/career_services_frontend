@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-
+import Template1 from './Template1.vue';
 import ResumeServices from '../services/ResumeServices';
 import { storeToRefs } from 'pinia';
 import { useGlobalStore } from '../stores/globalStore';
@@ -153,13 +153,15 @@ async function generateResume() {
       </template>
       <v-carousel-item v-for="(slide, i) in 2" :key="slide" :value="i">
         <v-sheet color="#232323" :rounded="rounded">
-          
+          <Template1 type="preview" :fullProfile="fullProfile" :isSlide="true" :resume="sampleResume1"
+            v-if="slide == 1 && fullProfile && sampleResume1" />
         </v-sheet>
       </v-carousel-item>
     </v-carousel>
   </div>
   <div v-else-if="modelSelected == true && resumePreview == false">
-   
+    <Template1 type="edit" :generateResume="generateResume" :fullProfile="fullProfile" :isSlide="true"
+      :resume="sampleResume1" ref="templateRef" v-if="model == 0 && fullProfile && sampleResume1" />
   </div>
   <div v-else-if="resumePreview == true">
     <v-row class="mt-3 mb-3 mr-10">
@@ -167,7 +169,7 @@ async function generateResume() {
         <v-btn class="mr-3" variant="flat" color="secondary" :to="{ name: 'resumes' }">Back</v-btn>
       </v-col>
     </v-row>
-    
+    <Template1 type="preview" :resume="resumeByRoute" v-if="resumeByRoute?.templateType == 1" />
   </div>
 
   <v-row v-if="modelSelected == true && resumePreview == false">
