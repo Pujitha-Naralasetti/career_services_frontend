@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue';
 import careerServicesBG from "./images/career-bg.jpeg";
 import { useRouter } from 'vue-router';
+import '@vuepic/vue-datepicker/dist/main.css'
 import UserServices from "./services/UserServices";
 import { useGlobalStore } from './stores/globalStore'
 import { storeToRefs } from 'pinia';
@@ -33,10 +34,10 @@ const logout = () => {
   //   });
   localStorage.removeItem("user");
   user.value = null;
-  userInfo.value = null;
+  router.push({ name: "login" });
   progressBar.value = false;
   snackBar.value = { value: true, color: "green", text: "Logout Success..." }
-  router.push({ name: "login" });
+  userInfo.value = null;
 }
 const closeSnackBar = () => {
   snackBar.value = { value: false, color: "", text: "" }
@@ -51,6 +52,7 @@ const onLogin = () => {
   <v-app :style="{
     'background-image': `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
                   url(${careerServicesBG})`,
+    'background-attachment': 'fixed',
     'background-position': 'center',
     'background-repeat': 'no-repeat',
     'background-size': 'cover',
@@ -62,7 +64,7 @@ const onLogin = () => {
       </template>
       <template v-else>
         <v-layout>
-          <v-navigation-drawer class="bg-deep-purple" theme="dark" permanent v-model="drawer" :rail="rail"
+          <v-navigation-drawer class="bg-deep-purple leftNav" theme="dark" permanent v-model="drawer" :rail="rail"
             @click="rail = false">
             <template v-slot:prepend>
               <v-list-item :title="userInfo?.firstName + ' ' + userInfo?.lastName" nav
@@ -70,8 +72,8 @@ const onLogin = () => {
                 <template v-slot:prepend>
                   <v-avatar color="#7952C0">
                     <span class="white-text text-h5">{{
-                      `${userInfo?.firstName.charAt(0)}${userInfo?.lastName.charAt(0)}`
-                    }}</span>
+    `${userInfo?.firstName.charAt(0)}${userInfo?.lastName.charAt(0)}`
+  }}</span>
                   </v-avatar>
                 </template>
                 <template v-slot:append>
@@ -96,12 +98,12 @@ const onLogin = () => {
             <template v-slot:append>
               <v-list density="compact" nav>
                 <v-list-item v-bind:style="{
-                  'background-color': '#000000  !important',
-                }" variant="tonal" prepend-icon="mdi-logout-variant" @click="logout">
+    'background-color': '#000000  !important',
+  }" variant="tonal" prepend-icon="mdi-logout-variant" @click="logout">
                   <v-list-item-title v-bind:style="{
-                    'font-size': '16px',
-                    'font-weight': 600
-                  }" v-text="'Logout'"></v-list-item-title></v-list-item>
+    'font-size': '16px',
+    'font-weight': 600
+  }" v-text="'Logout'"></v-list-item-title></v-list-item>
               </v-list>
             </template>
           </v-navigation-drawer>
@@ -119,3 +121,17 @@ const onLogin = () => {
     </template>
   </v-snackbar>
 </template>
+<style scoped>
+.leftNav {
+  position: fixed !important;
+}
+
+/* .v-card {
+  overflow: visible !important;
+} */
+
+.vdp-datepicker__calendar {
+  z-index: 10000 !important;
+  /* Ensure this is higher than other elements */
+}
+</style>
