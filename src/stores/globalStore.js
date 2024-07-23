@@ -11,11 +11,11 @@ export const useGlobalStore = defineStore("dataStore", () => {
   const progressBar = ref(false);
 
   const userInfo = ref({
+    id: null,
     firstName: "",
     lastName: "",
     phone: "",
     email: "",
-    password: "",
     gender: "",
     roleId: null,
     nationality: "",

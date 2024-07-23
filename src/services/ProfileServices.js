@@ -58,4 +58,22 @@ export default {
   getSkillsByUserId(userId) {
     return apiClient.get("skills/user/" + userId);
   },
+  addLanguages(userId, data) {
+    return apiClient.post("languages/" + userId, data);
+  },
+  updateLanguages(userId, data) {
+    return apiClient.put("languages/" + userId, data);
+  },
+  getLanguagesByUserId(userId) {
+    return apiClient.get("languages/user/" + userId);
+  },
+  addOnlineProfiles(userId, data) {
+    return apiClient.post("onlineProfile/" + userId, data);
+  },
+  updateOnlineProfiles(userId, data) {
+    return apiClient.put("onlineProfile/" + userId, data);
+  },
+  getOnlineProfilesByUserId(userId) {
+    return apiClient.get("onlineProfile/user/" + userId);
+  },
 };

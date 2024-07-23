@@ -2,7 +2,6 @@
 import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import VueDatePicker from '@vuepic/vue-datepicker';
-import '@vuepic/vue-datepicker/dist/main.css'
 import UserServices from "../services/UserServices.js";
 import { useGlobalStore } from "../stores/globalStore.js";
 import { storeToRefs } from "pinia";
@@ -14,19 +13,25 @@ const router = useRouter();
 const globalStore = useGlobalStore();
 const { snackBar, userInfo, progressBar } = storeToRefs(globalStore);
 const genders = ref(["Male", "Female"]);
+const onlineProfiles = ref(["Linked In", "GitHub"]);
 const isEditProfile = ref(false);
 const isEditEducation = ref(false);
 const isEditCertificates = ref(false);
 const isEditSkills = ref(false);
+const isEditLanguages = ref(false);
+const isEditOnlineProfiles = ref(false);
 const isEditAwards = ref(false);
 const isEditExperience = ref(false);
 const isEditProjects = ref(false);
 const showDeleteConf = ref(false);
 const emailInValid = ref(false);
 const skillName = ref("");
+const languageName = ref("");
 const certificateDetails = ref([]);
 const awardsAndAchievements = ref([]);
 const skillDetails = ref([]);
+const languageDetails = ref([]);
+const onlineProfileDetails = ref([]);
 const experienceDetails = ref([]);
 const projectDetails = ref([]);
 const educationDetails = ref([]);
@@ -103,6 +108,8 @@ async function getFullProfile(userId) {
             educationDetails.value = result?.education;
             certificateDetails.value = result?.certifications;
             skillDetails.value = result?.skills;
+            languageDetails.value = result?.languages;
+            onlineProfileDetails.value = result?.onlineProfiles;
             awardsAndAchievements.value = result?.awards;
             experienceDetails.value = result?.experiences;
             projectDetails.value = result?.projects;
@@ -229,7 +236,8 @@ function addEducation() {
         course: '',
         startDate: null,
         endDate: null,
-        gpa: ''
+        gpa: '',
+        address: ''
     });
 }
 
@@ -257,7 +265,6 @@ async function updateEducationDetails() {
                     text: response.data.message,
                 }
                 educationDetails.value = response.data.data;
-                // getEducation(user.value?.id);
             } else {
                 snackBar.value = {
                     value: true,
@@ -311,7 +318,6 @@ async function updateCertificatesDetails() {
                     text: response.data.message,
                 }
                 certificateDetails.value = response.data.data;
-                // getCertificates(user.value?.id);
             } else {
                 snackBar.value = {
                     value: true,
@@ -364,7 +370,6 @@ async function updateAwardsDetails() {
                     text: response.data.message,
                 }
                 awardsAndAchievements.value = response.data.data;
-                // getAwards(user.value?.id);
             } else {
                 snackBar.value = {
                     value: true,
@@ -389,9 +394,10 @@ function addExperience() {
         company: '',
         designation: '',
         isInternship: false,
-        jobType: '',
+        jobType: 'Full Time',
         startDate: null,
         endDate: null,
+        address: ''
     });
 }
 
@@ -419,7 +425,6 @@ async function updateExperienceDetails() {
                     text: response.data.message,
                 }
                 experienceDetails.value = response.data.data;
-                // getExperience(user.value?.id);
             } else {
                 snackBar.value = {
                     value: true,
@@ -474,7 +479,56 @@ async function updateProjectsDetails() {
                     text: response.data.message,
                 }
                 projectDetails.value = response.data.data;
-                // getProjects(user.value?.id);
+            } else {
+                snackBar.value = {
+                    value: true,
+                    color: "error",
+                    text: response.data.message,
+                }
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+            snackBar.value = {
+                value: true,
+                color: "error",
+                text: error.response.data.message,
+            }
+        });
+}
+
+function addOnlineProfiles() {
+    onlineProfileDetails.value.push({
+        userId: user.value.id,
+        name: '',
+        link: '',
+    });
+}
+
+function deleteOnlineProfiles(index) {
+    onlineProfileDetails.value.splice(index, 1);
+}
+
+function openEditOnlineProfiles() {
+    isEditOnlineProfiles.value = true;
+}
+
+function closeEditOnlineProfiles() {
+    isEditOnlineProfiles.value = false;
+    getOnlineProfiles();
+}
+
+async function updateOnlineProfilesDetails() {
+    await ProfileServices.updateOnlineProfiles(user?.value?.id, onlineProfileDetails.value)
+        .then((response) => {
+            if (response.data.status === "Success") {
+                isEditOnlineProfiles.value = false;
+                snackBar.value = {
+                    value: true,
+                    color: "green",
+                    text: response.data.message,
+                }
+                onlineProfileDetails.value = response.data.data;
             } else {
                 snackBar.value = {
                     value: true,
@@ -526,7 +580,57 @@ async function updateSkillsDetails() {
                     text: response.data.message,
                 }
                 skillDetails.value = response.data.data;
-                // getSkills(user.value?.id);
+            } else {
+                snackBar.value = {
+                    value: true,
+                    color: "error",
+                    text: response.data.message,
+                }
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+            snackBar.value = {
+                value: true,
+                color: "error",
+                text: error.response.data.message,
+            }
+        });
+}
+
+function addLanguages(language) {
+    languageDetails.value.push({
+        userId: user.value.id,
+        id: null,
+        name: language,
+    });
+    languageName.value = "";
+}
+
+function deleteLanguages(index) {
+    languageDetails.value.splice(index, 1);
+}
+
+function openEditLanguages() {
+    isEditLanguages.value = true;
+}
+
+function closeEditLanguages() {
+    isEditLanguages.value = false;
+    getLanguages();
+}
+
+async function updateLanguagesDetails() {
+    await ProfileServices.updateLanguages(user?.value?.id, languageDetails.value)
+        .then((response) => {
+            if (response.data.status === "Success") {
+                isEditLanguages.value = false;
+                snackBar.value = {
+                    value: true,
+                    color: "green",
+                    text: response.data.message,
+                }
+                languageDetails.value = response.data.data;
             } else {
                 snackBar.value = {
                     value: true,
@@ -594,6 +698,50 @@ async function getSkills() {
         .then((response) => {
             if (response.data.status === "Success") {
                 skillDetails.value = response.data.data;
+            } else {
+                snackBar.value = {
+                    value: true,
+                    color: "error",
+                    text: response.data.message,
+                }
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+            snackBar.value = {
+                value: true,
+                color: "error",
+                text: error.response.data.message,
+            }
+        });
+}
+async function getLanguages() {
+    await ProfileServices.getLanguagesByUserId(user?.value?.id)
+        .then((response) => {
+            if (response.data.status === "Success") {
+                languageDetails.value = response.data.data;
+            } else {
+                snackBar.value = {
+                    value: true,
+                    color: "error",
+                    text: response.data.message,
+                }
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+            snackBar.value = {
+                value: true,
+                color: "error",
+                text: error.response.data.message,
+            }
+        });
+}
+async function getOnlineProfiles() {
+    await ProfileServices.getOnlineProfilesByUserId(user?.value?.id)
+        .then((response) => {
+            if (response.data.status === "Success") {
+                onlineProfileDetails.value = response.data.data;
             } else {
                 snackBar.value = {
                     value: true,
@@ -773,6 +921,9 @@ async function getProjects() {
                     <v-col cols="6">
                         <p><b>Percentage/gpa: </b>{{ education.gpa }}</p>
                     </v-col>
+                    <v-col cols="6">
+                        <p><b>Address: </b>{{ education.address }}</p>
+                    </v-col>
                     <v-divider v-if="eIndex < educationDetails?.length - 1" class="mb-2"></v-divider>
                 </v-row>
             </v-card-text>
@@ -841,6 +992,34 @@ async function getProjects() {
                 </p>
                 <v-row v-for="(skill, sIndex) in skillDetails" :key="sIndex" class="mt-1 mx-15" align="center">
                     <li class="mb-4">{{ skill.name }}
+                    </li>
+                </v-row>
+            </v-card-text>
+        </v-card>
+        <v-card v-if="user.roleId == 1" class="mt-3 rounded-lg elevation-5" color="#232323" dark>
+            <v-card-title>
+                <v-row align="center" justify="space-between">
+                    <v-col cols="auto">
+                        <p class="text-h5 font-italic">
+                            Languages:
+                        </p>
+                    </v-col>
+                    <v-col cols="auto">
+                        <v-btn class="ma-2" color="black" size="x-small" icon="mdi-pencil"
+                            @click="openEditLanguages"></v-btn>
+                    </v-col>
+                </v-row>
+            </v-card-title>
+            <v-card-text>
+                <p v-if="languageDetails?.length == 0" colspan="8" v-bind:style="{
+                    color: '#707070',
+                    'font-size': '14px',
+                    textAlign: 'center',
+                }">
+                    No data available...
+                </p>
+                <v-row v-for="(language, lIndex) in languageDetails" :key="lIndex" class="mt-1 mx-15" align="center">
+                    <li class="mb-4">{{ language.name }}
                     </li>
                 </v-row>
             </v-card-text>
@@ -923,6 +1102,9 @@ async function getProjects() {
                         <p><b>Duration: </b>{{ moment(exp.startDate).format('YYYY-MM-DD') }} - {{
                     exp.endDate ? moment(exp.endDate).format('YYYY-MM-DD') : "On Going" }}</p>
                     </v-col>
+                    <v-col cols="6">
+                        <p><b>Address: </b>{{ exp.address }}</p>
+                    </v-col>
                     <v-divider v-if="eIndex < experienceDetails?.length - 1" class="mb-2"></v-divider>
                 </v-row>
             </v-card-text>
@@ -970,6 +1152,40 @@ async function getProjects() {
                 </v-row>
             </v-card-text>
         </v-card>
+        <v-card v-if="user.roleId == 1" class="mt-3 rounded-lg elevation-5" color="#232323" dark>
+            <v-card-title>
+                <v-row align="center" justify="space-between">
+                    <v-col cols="auto">
+                        <p class="text-h5 font-italic">
+                            Online Profiles:
+                        </p>
+                    </v-col>
+                    <v-col cols="auto">
+                        <v-btn class="ma-2" color="black" size="x-small" icon="mdi-pencil"
+                            @click="openEditOnlineProfiles"></v-btn>
+                    </v-col>
+                </v-row>
+            </v-card-title>
+            <v-card-text>
+                <p v-if="onlineProfileDetails?.length == 0" colspan="8" v-bind:style="{
+                    color: '#707070',
+                    'font-size': '14px',
+                    textAlign: 'center',
+                }">
+                    No data available...
+                </p>
+                <v-row v-for="(profile, profileIndex) in onlineProfileDetails" :key="profileIndex" class="mt-1 mx-15"
+                    align="center">
+                    <v-col cols="6">
+                        <p><b>Name: </b>{{ profile.name }}</p>
+                    </v-col>
+                    <v-col cols="6">
+                        <p><b>Link: </b>{{ profile.link }}</p>
+                    </v-col>
+                    <v-divider v-if="profileIndex < onlineProfileDetails?.length - 1" class="mb-2"></v-divider>
+                </v-row>
+            </v-card-text>
+        </v-card>
         <v-row class="mt-4" align="center" justify="center">
             <v-col cols="auto">
                 <v-btn variant="flat" color="red" @click="(e) => openDeletePopup(e)" :disabled="!user?.id">Deactivate
@@ -1013,6 +1229,9 @@ async function getProjects() {
                                 <VueDatePicker v-model="education.endDate" :enable-time-picker="false" color="#232323"
                                     placeholder="End Date" dark>
                                 </VueDatePicker>
+                            </v-col>
+                            <v-col cols="6">
+                                <v-textarea v-model="education.address" label="Address*" rows="3" outlined></v-textarea>
                             </v-col>
                         </v-row>
                     </v-col>
@@ -1129,6 +1348,42 @@ async function getProjects() {
             </v-card-actions>
         </v-card>
     </v-dialog>
+    <v-dialog persistent v-model="isEditLanguages" width="700">
+        <v-card color="#232323" class="rounded-lg elevation-5">
+            <v-card-title class="headline mb-2">Edit Languages</v-card-title>
+            <v-card-text>
+                <p v-if="languageDetails?.length == 0" colspan="8" v-bind:style="{
+                    color: '#707070',
+                    'font-size': '14px',
+                    textAlign: 'center',
+                }">
+                    No data available. Click on Add New to insert data...
+                </p>
+                <template v-for="(language, lIndex) in languageDetails" :key="lIndex">
+                    <v-chip class="ma-2" label>{{ language?.name }}
+                        <v-icon end icon="mdi-close-circle" @click="deleteLanguages(lIndex)"></v-icon>
+                    </v-chip>
+                </template>
+                <v-row justify="center" align="center" class="mt-3">
+                    <v-col cols="4">
+                        <v-text-field v-model="languageName" label="Enter language..."
+                            @keydown.enter="addLanguages(languageName)"></v-text-field>
+                    </v-col>
+                    <v-col cols="4">
+                        <v-btn @click="addLanguages(languageName)" color="primary">
+                            <v-icon left>mdi-plus</v-icon>
+                            Add
+                        </v-btn>
+                    </v-col>
+                </v-row>
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn @click="closeEditLanguages">Close</v-btn>
+                <v-btn variant="outlined" @click="updateLanguagesDetails">Update Languages</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 
     <v-dialog persistent v-model="isEditAwards" width="700">
         <v-card color="#232323" class="rounded-lg elevation-5">
@@ -1219,6 +1474,9 @@ async function getProjects() {
                                     placeholder="End Date" dark>
                                 </VueDatePicker>
                             </v-col>
+                            <v-col cols="6">
+                                <v-textarea v-model="exp.address" label="Address*" rows="3" outlined></v-textarea>
+                            </v-col>
                         </v-row>
                     </v-col>
                     <v-col cols="1">
@@ -1298,6 +1556,50 @@ async function getProjects() {
                 <v-spacer></v-spacer>
                 <v-btn @click="closeEditProjects">Close</v-btn>
                 <v-btn variant="outlined" @click="updateProjectsDetails">Update Projects</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+    <v-dialog persistent v-model="isEditOnlineProfiles" width="700">
+        <v-card color="#232323" class="rounded-lg elevation-5">
+            <v-card-title class="headline mb-2">Edit Online Profiles</v-card-title>
+            <v-card-text>
+                <p v-if="onlineProfileDetails?.length == 0" colspan="8" v-bind:style="{
+                    color: '#707070',
+                    'font-size': '14px',
+                    textAlign: 'center',
+                }">
+                    No data available. Click on Add New to insert data...
+                </p>
+                <v-row v-for="(project, profileIndex) in onlineProfileDetails" :key="profileIndex" align="center">
+                    <v-col cols="11">
+                        <v-row align="center">
+                            <v-col cols="6">
+                                <v-select :items="onlineProfiles" label="Profile Name*" v-model="project.name"
+                                    required></v-select>
+                            </v-col>
+                            <v-col cols="6">
+                                <v-text-field v-model="project.link" label="Profile Link*" required></v-text-field>
+                            </v-col>
+                        </v-row>
+                    </v-col>
+                    <v-col cols="1">
+                        <v-btn icon size="x-small" @click="deleteOnlineProfiles(profileIndex)" color="black">
+                            <v-icon color="red">mdi-delete</v-icon>
+                        </v-btn>
+                    </v-col>
+                    <v-divider v-if="profileIndex < onlineProfileDetails?.length - 1" class="mb-2"></v-divider>
+                </v-row>
+                <v-row justify="center" class="mt-3">
+                    <v-btn @click="addOnlineProfiles" color="primary">
+                        <v-icon left>mdi-plus</v-icon>
+                        Add New
+                    </v-btn>
+                </v-row>
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn @click="closeEditOnlineProfiles">Close</v-btn>
+                <v-btn variant="outlined" @click="updateOnlineProfilesDetails">Update OnlineProfiles</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
