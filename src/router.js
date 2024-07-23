@@ -28,6 +28,11 @@ const router = createRouter({
       name: "generateResume",
       component: () => import("./views/GenerateResume.vue"),
     },
+    {
+      path: "/Resume/:id",
+      name: "resumeById",
+      component: () => import("./components/TemplateSlides.vue"),
+    },
   ],
 });
 
