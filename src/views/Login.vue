@@ -3,7 +3,6 @@ import { onMounted } from "vue";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import VueDatePicker from '@vuepic/vue-datepicker';
-import '@vuepic/vue-datepicker/dist/main.css'
 import UserServices from "../services/UserServices.js";
 import { useGlobalStore } from "../stores/globalStore.js";
 import { storeToRefs } from "pinia";
@@ -220,16 +219,16 @@ function onEmailChange() {
             <v-spacer></v-spacer>
             <v-btn @click="closeCreateAccount()">Close</v-btn>
             <v-btn variant="outlined" :disabled="emailInValid ||
-              !user.email ||
-              !user.password ||
-              !user.phone ||
-              !user.nationality ||
-              !user.gender ||
-              !user.dateOfBirth ||
-              !user.roleId ||
-              !user.firstName ||
-              !user.address ||
-              !user.lastName" @click="createAccount()">Create Account</v-btn>
+            !user.email ||
+            !user.password ||
+            !user.phone ||
+            !user.nationality ||
+            !user.gender ||
+            !user.dateOfBirth ||
+            !user.roleId ||
+            !user.firstName ||
+            !user.address ||
+            !user.lastName" @click="createAccount()">Create Account</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>

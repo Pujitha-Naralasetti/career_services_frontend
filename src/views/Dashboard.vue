@@ -17,8 +17,8 @@ onMounted(async () => {
   <v-container>
     <div id="body">
       <div :class="['text-h4']">
-        welcome {{ userInfo.firstName }} {{ userInfo.lastName }}!</div>
-      <v-row  class="mt-10 gc-10" justify="center">
+        welcome {{ userInfo?.firstName }} {{ userInfo?.lastName }}!</div>
+      <v-row class="mt-10 gc-10" justify="center">
         <v-col cols="3">
           <v-card color="#232323" class="rounded-lg" max-width="600" dark>
             <v-card-title>My Resumes</v-card-title>
@@ -38,7 +38,7 @@ onMounted(async () => {
           <v-card color="#232323" class="rounded-lg" max-width="600" dark>
             <v-card-title>My Profile</v-card-title>
             <v-card-text>
-              {{ userInfo.roleId == 1 ? "Student" : "Staff" }}
+              Student
             </v-card-text>
             <v-card-action>
               <v-row justify="end" class="mb-3 mr-3">
