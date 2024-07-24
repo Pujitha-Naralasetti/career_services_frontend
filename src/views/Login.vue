@@ -3,7 +3,6 @@ import { onMounted } from "vue";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import VueDatePicker from '@vuepic/vue-datepicker';
-import '@vuepic/vue-datepicker/dist/main.css'
 import UserServices from "../services/UserServices.js";
 import { useGlobalStore } from "../stores/globalStore.js";
 import { storeToRefs } from "pinia";
@@ -12,6 +11,10 @@ const router = useRouter();
 const isCreateAccount = ref(false);
 const emailInValid = ref(false);
 const genders = ref(["Male", "Female"]);
+
+const props = defineProps({
+  onLogin: Function,
+});
 
 const globalStore = useGlobalStore();
 const { snackBar, userInfo } = storeToRefs(globalStore);
@@ -91,6 +94,7 @@ async function login() {
         dateOfBirth: null,
       };
       router.push({ name: "dashboard" });
+      props.onLogin();
     })
     .catch((error) => {
       console.log(error);
