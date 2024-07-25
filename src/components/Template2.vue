@@ -147,20 +147,11 @@ defineExpose({
                     <h3 class="subHeading">EDUCATION</h3>
                     <v-divider></v-divider>
                     <div class="contentWrap" v-for="(education, eIndex) in educationDetails" :key="eIndex">
-                      <v-row>
-                        <v-col>
-                          <p class="regularText">
-                            <b>{{ education?.institutionName }},</b> {{ education?.address }}
-                          </p>
-                        </v-col>
-                        <v-col>
-                          <p class="regularTextEnd">
-                            {{
+                      <p class="regularText">
+                        <b>{{ education?.institutionName }},</b> {{ education?.address }} | {{
               moment(education?.startDate).format('YYYY-MM-DD') }} - {{
               moment(education?.endDate).format('YYYY-MM-DD') }}
-                          </p>
-                        </v-col>
-                      </v-row>
+                      </p>
                       <p class="regularText">{{ education?.degree }} in {{ education?.course }}</p>
                       <p class="regularText"><b>GPA:</b> {{ education?.gpa }}</p>
                     </div>
