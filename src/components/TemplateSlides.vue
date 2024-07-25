@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import Template1 from './Template1.vue';
 import Template2 from './Template2.vue';
 import Template3 from './Template3.vue';
+import Template4 from './Template4.vue';
 import ResumeServices from '../services/ResumeServices';
 import { storeToRefs } from 'pinia';
 import { useGlobalStore } from '../stores/globalStore';
@@ -23,6 +24,7 @@ const fullProfile = ref(null);
 const sampleResume1 = ref(null);
 const sampleResume2 = ref(null);
 const sampleResume3 = ref(null);
+const sampleResume4 = ref(null);
 
 const model = ref(0)
 onMounted(async () => {
@@ -78,6 +80,7 @@ async function getSampleResumes() {
       sampleResume1.value = response.data?.data[0];
       sampleResume2.value = response.data?.data[1];
       sampleResume3.value = response.data?.data[2];
+      sampleResume4.value = response.data?.data[3];
     })
     .catch((error) => {
       console.log(error);
@@ -163,6 +166,8 @@ async function generateResume() {
             v-else-if="slide == 2 && fullProfile && sampleResume2" />
           <Template3 type="preview" :fullProfile="fullProfile" :isSlide="true" :resume="sampleResume3"
             v-else-if="slide == 3 && fullProfile && sampleResume3" />
+          <Template4 type="preview" :fullProfile="fullProfile" :isSlide="true" :resume="sampleResume4"
+            v-else-if="slide == 4 && fullProfile && sampleResume4" />
         </v-sheet>
       </v-carousel-item>
     </v-carousel>
@@ -174,6 +179,8 @@ async function generateResume() {
       :resume="sampleResume2" ref="templateRef" v-else-if="model == 1 && fullProfile && sampleResume2" />
     <Template3 type="edit" :generateResume="generateResume" :fullProfile="fullProfile" :isSlide="true"
       :resume="sampleResume3" ref="templateRef" v-else-if="model == 2 && fullProfile && sampleResume3" />
+    <Template4 type="edit" :generateResume="generateResume" :fullProfile="fullProfile" :isSlide="true"
+      :resume="sampleResume4" ref="templateRef" v-else-if="model == 3 && fullProfile && sampleResume4" />
   </div>
   <div v-else-if="resumePreview == true">
     <v-row class="mt-3 mb-3 mr-10">
@@ -184,6 +191,7 @@ async function generateResume() {
     <Template1 type="preview" :resume="resumeByRoute" v-if="resumeByRoute?.templateType == 1" />
     <Template2 type="preview" :resume="resumeByRoute" v-else-if="resumeByRoute?.templateType == 2" />
     <Template3 type="preview" :resume="resumeByRoute" v-else-if="resumeByRoute?.templateType == 3" />
+    <Template4 type="preview" :resume="resumeByRoute" v-else-if="resumeByRoute?.templateType == 4" />
   </div>
 
   <v-row v-if="modelSelected == true && resumePreview == false">
