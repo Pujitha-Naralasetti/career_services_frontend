@@ -10,6 +10,7 @@ import { useGlobalStore } from '../stores/globalStore';
 import { useRoute, useRouter } from 'vue-router';
 import { onMounted } from 'vue';
 import ProfileServices from '../services/ProfileServices';
+import AskAI from './AskAI.vue';
 
 
 const route = useRoute();
@@ -18,6 +19,8 @@ const globalStore = useGlobalStore();
 const { snackBar, userInfo } = storeToRefs(globalStore);
 const modelSelected = ref(false);
 const templateRef = ref(null);
+const resumeId = ref(null);
+const isCheckJob = ref(false);
 const resumePreview = ref(false);
 const resumeByRoute = ref(null);
 const fullProfile = ref(null);
@@ -29,6 +32,7 @@ const sampleResume4 = ref(null);
 const model = ref(0)
 onMounted(async () => {
   if (route?.params?.id) {
+    resumeId.value = route?.params?.id;
     resumePreview.value = true;
     await getResumeById(route?.params?.id);
   } else {
@@ -136,6 +140,14 @@ async function generateResume() {
       }
     });
 }
+
+function checkJob() {
+  isCheckJob.value = true;
+}
+
+function closeCheckJob() {
+  isCheckJob.value = false;
+}
 </script>
 <template>
   <div v-if="modelSelected == false && resumePreview == false">
@@ -186,6 +198,8 @@ async function generateResume() {
     <v-row class="mt-3 mb-3 mr-10">
       <v-col align="end">
         <v-btn class="mr-3" variant="flat" color="secondary" :to="{ name: 'resumes' }">Back</v-btn>
+        <v-btn class="mr-3" v-if="userInfo?.roleId == 1" variant="flat" color="primary" @click="checkJob">Check Job
+          Compatibility</v-btn>
       </v-col>
     </v-row>
     <Template1 type="preview" :resume="resumeByRoute" v-if="resumeByRoute?.templateType == 1" />
@@ -203,4 +217,6 @@ async function generateResume() {
       </div>
     </v-col>
   </v-row>
+  <AskAI v-if="resumePreview == true && isCheckJob" :isCheckJob="isCheckJob" :closeCheckJob="closeCheckJob"
+    :resumeId="resumeId" />
 </template>

@@ -1,6 +1,9 @@
 import apiClient from "./services";
 
 export default {
+  getAllResumes() {
+    return apiClient.get("resumes");
+  },
   getResumesByUserId(userId) {
     return apiClient.get("resumes/user/" + userId);
   },
@@ -9,6 +12,9 @@ export default {
   },
   getSampleResumes() {
     return apiClient.get("resumes/getAllSampleTemplates");
+  },
+  checkResumeCompatibility(data) {
+    return apiClient.post("resumes/user/askai", data);
   },
   addResume(userId, data) {
     return apiClient.post("resumes/" + userId, data);
