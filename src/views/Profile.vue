@@ -7,6 +7,7 @@ import { useGlobalStore } from "../stores/globalStore.js";
 import { storeToRefs } from "pinia";
 import moment from "moment";
 import ProfileServices from "../services/ProfileServices.js";
+import CommonServices from "../services/CommonServices.js";
 
 const router = useRouter();
 
@@ -35,6 +36,10 @@ const onlineProfileDetails = ref([]);
 const experienceDetails = ref([]);
 const projectDetails = ref([]);
 const educationDetails = ref([]);
+const alert = ref({
+    show: false,
+    value: ""
+});
 const user = ref({
     id: "",
     roleId: "",
@@ -255,32 +260,40 @@ function closeEditEducation() {
 }
 
 async function updateEducationDetails() {
-    await ProfileServices.updateEducation(user?.value?.id, educationDetails.value)
-        .then((response) => {
-            if (response.data.status === "Success") {
-                isEditEducation.value = false;
-                snackBar.value = {
-                    value: true,
-                    color: "green",
-                    text: response.data.message,
+    let checkMandatory = CommonServices.checkEducation(educationDetails.value);
+    if (checkMandatory != "cool") {
+        alert.value = {
+            show: true,
+            value: checkMandatory
+        }
+    } else {
+        await ProfileServices.updateEducation(user?.value?.id, educationDetails.value)
+            .then((response) => {
+                if (response.data.status === "Success") {
+                    isEditEducation.value = false;
+                    snackBar.value = {
+                        value: true,
+                        color: "green",
+                        text: response.data.message,
+                    }
+                    educationDetails.value = response.data.data;
+                } else {
+                    snackBar.value = {
+                        value: true,
+                        color: "error",
+                        text: response.data.message,
+                    }
                 }
-                educationDetails.value = response.data.data;
-            } else {
+            })
+            .catch((error) => {
+                console.log(error);
                 snackBar.value = {
                     value: true,
                     color: "error",
-                    text: response.data.message,
+                    text: error.response.data.message,
                 }
-            }
-        })
-        .catch((error) => {
-            console.log(error);
-            snackBar.value = {
-                value: true,
-                color: "error",
-                text: error.response.data.message,
-            }
-        });
+            });
+    }
 }
 
 function addCertificates() {
@@ -307,33 +320,48 @@ function closeEditCertificates() {
     getCertificates();
 }
 
+function closeAlert() {
+    alert.value = {
+        show: false,
+        value: ""
+    }
+}
+
 async function updateCertificatesDetails() {
-    await ProfileServices.updateCertificates(user?.value?.id, certificateDetails.value)
-        .then((response) => {
-            if (response.data.status === "Success") {
-                isEditCertificates.value = false;
-                snackBar.value = {
-                    value: true,
-                    color: "green",
-                    text: response.data.message,
+    let checkMandatory = CommonServices.checkCertificates(certificateDetails.value);
+    if (checkMandatory != "cool") {
+        alert.value = {
+            show: true,
+            value: checkMandatory
+        }
+    } else {
+        await ProfileServices.updateCertificates(user?.value?.id, certificateDetails.value)
+            .then((response) => {
+                if (response.data.status === "Success") {
+                    isEditCertificates.value = false;
+                    snackBar.value = {
+                        value: true,
+                        color: "green",
+                        text: response.data.message,
+                    }
+                    certificateDetails.value = response.data.data;
+                } else {
+                    snackBar.value = {
+                        value: true,
+                        color: "error",
+                        text: response.data.message,
+                    }
                 }
-                certificateDetails.value = response.data.data;
-            } else {
+            })
+            .catch((error) => {
+                console.log(error);
                 snackBar.value = {
                     value: true,
                     color: "error",
-                    text: response.data.message,
+                    text: error.response.data.message,
                 }
-            }
-        })
-        .catch((error) => {
-            console.log(error);
-            snackBar.value = {
-                value: true,
-                color: "error",
-                text: error.response.data.message,
-            }
-        });
+            });
+    }
 }
 
 function addAwards() {
@@ -360,32 +388,40 @@ function closeEditAwards() {
 }
 
 async function updateAwardsDetails() {
-    await ProfileServices.updateAwards(user?.value?.id, awardsAndAchievements.value)
-        .then((response) => {
-            if (response.data.status === "Success") {
-                isEditAwards.value = false;
-                snackBar.value = {
-                    value: true,
-                    color: "green",
-                    text: response.data.message,
+    let checkMandatory = CommonServices.checkAwards(awardsAndAchievements.value);
+    if (checkMandatory != "cool") {
+        alert.value = {
+            show: true,
+            value: checkMandatory
+        }
+    } else {
+        await ProfileServices.updateAwards(user?.value?.id, awardsAndAchievements.value)
+            .then((response) => {
+                if (response.data.status === "Success") {
+                    isEditAwards.value = false;
+                    snackBar.value = {
+                        value: true,
+                        color: "green",
+                        text: response.data.message,
+                    }
+                    awardsAndAchievements.value = response.data.data;
+                } else {
+                    snackBar.value = {
+                        value: true,
+                        color: "error",
+                        text: response.data.message,
+                    }
                 }
-                awardsAndAchievements.value = response.data.data;
-            } else {
+            })
+            .catch((error) => {
+                console.log(error);
                 snackBar.value = {
                     value: true,
                     color: "error",
-                    text: response.data.message,
+                    text: error.response.data.message,
                 }
-            }
-        })
-        .catch((error) => {
-            console.log(error);
-            snackBar.value = {
-                value: true,
-                color: "error",
-                text: error.response.data.message,
-            }
-        });
+            });
+    }
 }
 
 function addExperience() {
@@ -415,32 +451,40 @@ function closeEditExperience() {
 }
 
 async function updateExperienceDetails() {
-    await ProfileServices.updateExperience(user?.value?.id, experienceDetails.value)
-        .then((response) => {
-            if (response.data.status === "Success") {
-                isEditExperience.value = false;
-                snackBar.value = {
-                    value: true,
-                    color: "green",
-                    text: response.data.message,
+    let checkMandatory = CommonServices.checkExperience(experienceDetails.value);
+    if (checkMandatory != "cool") {
+        alert.value = {
+            show: true,
+            value: checkMandatory
+        }
+    } else {
+        await ProfileServices.updateExperience(user?.value?.id, experienceDetails.value)
+            .then((response) => {
+                if (response.data.status === "Success") {
+                    isEditExperience.value = false;
+                    snackBar.value = {
+                        value: true,
+                        color: "green",
+                        text: response.data.message,
+                    }
+                    experienceDetails.value = response.data.data;
+                } else {
+                    snackBar.value = {
+                        value: true,
+                        color: "error",
+                        text: response.data.message,
+                    }
                 }
-                experienceDetails.value = response.data.data;
-            } else {
+            })
+            .catch((error) => {
+                console.log(error);
                 snackBar.value = {
                     value: true,
                     color: "error",
-                    text: response.data.message,
+                    text: error.response.data.message,
                 }
-            }
-        })
-        .catch((error) => {
-            console.log(error);
-            snackBar.value = {
-                value: true,
-                color: "error",
-                text: error.response.data.message,
-            }
-        });
+            });
+    }
 }
 
 function addProjects() {
@@ -469,32 +513,40 @@ function closeEditProjects() {
 }
 
 async function updateProjectsDetails() {
-    await ProfileServices.updateProjects(user?.value?.id, projectDetails.value)
-        .then((response) => {
-            if (response.data.status === "Success") {
-                isEditProjects.value = false;
-                snackBar.value = {
-                    value: true,
-                    color: "green",
-                    text: response.data.message,
+    let checkMandatory = CommonServices.checkProjects(projectDetails.value);
+    if (checkMandatory != "cool") {
+        alert.value = {
+            show: true,
+            value: checkMandatory
+        }
+    } else {
+        await ProfileServices.updateProjects(user?.value?.id, projectDetails.value)
+            .then((response) => {
+                if (response.data.status === "Success") {
+                    isEditProjects.value = false;
+                    snackBar.value = {
+                        value: true,
+                        color: "green",
+                        text: response.data.message,
+                    }
+                    projectDetails.value = response.data.data;
+                } else {
+                    snackBar.value = {
+                        value: true,
+                        color: "error",
+                        text: response.data.message,
+                    }
                 }
-                projectDetails.value = response.data.data;
-            } else {
+            })
+            .catch((error) => {
+                console.log(error);
                 snackBar.value = {
                     value: true,
                     color: "error",
-                    text: response.data.message,
+                    text: error.response.data.message,
                 }
-            }
-        })
-        .catch((error) => {
-            console.log(error);
-            snackBar.value = {
-                value: true,
-                color: "error",
-                text: error.response.data.message,
-            }
-        });
+            });
+    }
 }
 
 function addOnlineProfiles() {
@@ -916,7 +968,8 @@ async function getProjects() {
                     </v-col>
                     <v-col cols="6">
                         <p><b>Duration: </b>{{ moment(education.startDate).format('YYYY-MM-DD') }} <i>to</i> {{
-                    moment(education.endDate).format('YYYY-MM-DD') }}</p>
+                    education?.endDate ?
+                        moment(education?.endDate).format('YYYY-MM-DD') : "On Going" }}</p>
                     </v-col>
                     <v-col cols="6">
                         <p><b>Percentage/gpa: </b>{{ education.gpa }}</p>
@@ -959,7 +1012,8 @@ async function getProjects() {
                     </v-col>
                     <v-col cols="6">
                         <p><b>Duration: </b>{{ moment(cert.startDate).format('YYYY-MM-DD') }} - {{
-                    moment(cert.endDate).format('YYYY-MM-DD') }}</p>
+                    cert?.endDate ?
+                        moment(cert?.endDate).format('YYYY-MM-DD') : "On Going" }}</p>
                     </v-col>
                     <v-col cols="6">
                         <p><b>Percentage/Grade: </b>{{ cert.grade }}</p>
@@ -1215,7 +1269,7 @@ async function getProjects() {
                                 <v-text-field v-model="education.degree" label="Degree*" required></v-text-field>
                             </v-col>
                             <v-col cols="6">
-                                <v-text-field v-model="education.course" label="Course"></v-text-field>
+                                <v-text-field v-model="education.course" label="Course*"></v-text-field>
                             </v-col>
                             <v-col cols="6">
                                 <v-text-field v-model="education.gpa" label="Percentage/GPA*" required></v-text-field>
@@ -1274,7 +1328,7 @@ async function getProjects() {
                                 <v-text-field v-model="cert.name" label="Name*" required></v-text-field>
                             </v-col>
                             <v-col cols="6">
-                                <v-text-field v-model="cert.issuedBy" label="Issued By"></v-text-field>
+                                <v-text-field v-model="cert.issuedBy" label="Issued By*"></v-text-field>
                             </v-col>
                             <v-col cols="6">
                                 <v-text-field v-model="cert.grade" label="Percentage/Grade*" required></v-text-field>
@@ -1410,7 +1464,7 @@ async function getProjects() {
                             </v-col>
                             <v-col cols="6">
                                 <VueDatePicker v-model="award.date" :enable-time-picker="false" color="#232323"
-                                    placeholder="Issued Date" dark>
+                                    placeholder="Issued Date*" dark>
                                 </VueDatePicker>
                             </v-col>
                         </v-row>
@@ -1457,11 +1511,11 @@ async function getProjects() {
                                 <v-text-field v-model="exp.designation" label="Designation*" required></v-text-field>
                             </v-col>
                             <v-col cols="6">
-                                <v-select :items="['true', 'false']" label="Is Internship*" v-model="exp.isInternship"
+                                <v-select :items="['true', 'false']" label="Is Internship" v-model="exp.isInternship"
                                     required></v-select>
                             </v-col>
                             <v-col cols="6">
-                                <v-select :items="['Full Time', 'Part Time']" label="Job Type*" v-model="exp.jobType"
+                                <v-select :items="['Full Time', 'Part Time']" label="Job Type" v-model="exp.jobType"
                                     required></v-select>
                             </v-col>
                             <v-col cols="6">
@@ -1661,4 +1715,12 @@ async function getProjects() {
             </v-card>
         </v-container>
     </v-dialog>
+    <v-snackbar v-model="alert.show" :timeout="4000" color="#D53737" elevation="24">
+        <b>{{ alert.value }}</b> is Mandatory to Add...
+        <template v-slot:actions>
+            <v-btn variant="text" @click="closeAlert">
+                Close
+            </v-btn>
+        </template>
+    </v-snackbar>
 </template>
