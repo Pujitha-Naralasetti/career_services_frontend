@@ -18,10 +18,21 @@ const { snackBar, userInfo } = storeToRefs(globalStore);
 const jobTitle = ref("");
 const loader = ref(false);
 const resultsFetched = ref(false);
-const matchPercent = ref(78);
+const feedback = ref({
+  comments: "",
+  matchingScore: "",
+});
 
 onMounted(async () => {
 });
+
+function clearData() {
+  resultsFetched.value = false;
+  feedback.value = {
+    comments: "",
+    matchingScore: "",
+  };
+}
 
 async function askAI() {
   let payload = {
@@ -31,37 +42,34 @@ async function askAI() {
 
   };
   loader.value = true;
-  setTimeout(() => {
-    resultsFetched.value = true;
-  }, 3000);
-  // await ResumeServices.checkResumeCompatibility(payload)
-  //   .then((response) => {
-  //     loader.value = false;
-  //     if (response.data.status == "Success") {
-  //       resultsFetched.value = true;
-  //       snackBar.value = {
-  //         value: true,
-  //         color: "green",
-  //         text: response.data?.message,
-  //       }
-  //       router.push({ name: "resumes" });
-  //     } else {
-  //       snackBar.value = {
-  //         value: true,
-  //         color: "error",
-  //         text: response.data?.message,
-  //       }
-  //     }
-  //   })
-  //   .catch((error) => {
-  //     loader.value = false;
-  //     console.log(error);
-  //     snackBar.value = {
-  //       value: true,
-  //       color: "error",
-  //       text: error.response.data.message,
-  //     }
-  //   });
+  await ResumeServices.checkResumeCompatibility(payload)
+    .then((response) => {
+      loader.value = false;
+      if (response.data.status == "Success") {
+        resultsFetched.value = true;
+        feedback.value = { ...response.data?.data, matchingScore: response.data.data?.matchingScore?.replace("%", "") };
+        snackBar.value = {
+          value: true,
+          color: "green",
+          text: response.data?.message,
+        }
+      } else {
+        snackBar.value = {
+          value: true,
+          color: "error",
+          text: response.data?.message,
+        }
+      }
+    })
+    .catch((error) => {
+      loader.value = false;
+      console.log(error);
+      snackBar.value = {
+        value: true,
+        color: "error",
+        text: error.response.data.message,
+      }
+    });
 }
 </script>
 <template>
@@ -83,7 +91,7 @@ async function askAI() {
           <v-col cols="12">
             <v-row justify="center" align="center" class="mt-3">
               <v-col cols="6">
-                <v-text-field v-model="jobTitle" label="Enter Job Title..."></v-text-field>
+                <v-text-field v-model="jobTitle" @keydown.enter="askAI" label="Enter Job Title..."></v-text-field>
               </v-col>
             </v-row>
           </v-col>
@@ -91,21 +99,26 @@ async function askAI() {
       </v-card-text>
       <v-row v-else align="center">
         <v-col align="center" v-if="resultsFetched" cols="12">
-          <div v-if="matchPercent >= 75" class="success alert">
+          <div v-if="feedback?.matchingScore >= 75" class="success alert">
             <div class="alert-body">
-              {{ jobTitle }} {{ matchPercent }}% Match
+              {{ jobTitle }} - {{ feedback?.matchingScore }}% Match
             </div>
           </div>
-          <div v-else-if="matchPercent < 75 && matchPercent >= 50" class="warning alert">
+          <div v-else-if="feedback?.matchingScore < 75 && feedback?.matchingScore >= 50" class="warning alert">
             <div class="alert-body">
-              {{ jobTitle }} {{ matchPercent }}% Match
+              {{ jobTitle }} - {{ feedback?.matchingScore }}% Match
             </div>
           </div>
           <div v-else class="error alert">
             <div class="alert-body">
-              {{ jobTitle }} {{ matchPercent }}% Match
+              {{ jobTitle }} - {{ feedback?.matchingScore }}% Match
             </div>
           </div>
+          <p v-bind:style="{
+    color: '#707070',
+    'font-size': '14px',
+  }">{{ feedback?.comments }}
+          </p>
         </v-col>
         <v-col v-else cols="12">
           <v-skeleton-loader type="card" color="#232323"></v-skeleton-loader>
@@ -114,8 +127,10 @@ async function askAI() {
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn @click="props.closeCheckJob" class="mr-3">Close</v-btn>
-        <v-btn variant="flat" color="primary mr-5" :disabled="!jobTitle || loader || resultsFetched" @click="askAI">Ask
+        <v-btn v-if="!resultsFetched" variant="flat" color="primary mr-5" :disabled="!jobTitle || loader"
+          @click="askAI">Ask
           AI</v-btn>
+        <v-btn v-else="resultsFetched" variant="flat" color="primary mr-5" @click="clearData">Clear</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

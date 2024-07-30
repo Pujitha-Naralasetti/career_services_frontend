@@ -14,12 +14,18 @@ export default {
     return apiClient.get("resumes/getAllSampleTemplates");
   },
   checkResumeCompatibility(data) {
-    return apiClient.post("resumes/user/askai", data);
+    return apiClient.post("feedback/getFeedbackFromAI", data);
   },
   addResume(userId, data) {
     return apiClient.post("resumes/" + userId, data);
   },
+  updateResume(resumeId, data) {
+    return apiClient.put("resumes/" + resumeId, data);
+  },
   deleteResume(resumeId) {
     return apiClient.delete("resumes/" + resumeId);
+  },
+  getDashboardDetails(data) {
+    return apiClient.post("dashboard/getDashboardDetails", data);
   },
 };
