@@ -219,8 +219,8 @@ defineExpose({
                         <v-col>
                           <p class="regularTextEnd">
                             {{
-              moment(education?.startDate).format('YYYY-MM-DD') }} - {{
-              moment(education?.endDate).format('YYYY-MM-DD') }}
+              moment(education?.startDate).format('YYYY-MM-DD') }} - {{ education?.endDate ?
+              moment(education?.endDate).format('YYYY-MM-DD') : "On Going" }}
                           </p>
                         </v-col>
                       </v-row>
@@ -229,7 +229,7 @@ defineExpose({
                           <p class="regularText">{{ education?.degree }} in {{ education?.course }}</p>
                         </v-col>
                         <v-col>
-                          <p class="regularTextEnd"><b>GPA:</b> {{ education?.gpa }}</p>
+                          <p class="regularTextEnd"><b>GPA/Percentage:</b> {{ education?.gpa }}</p>
                         </v-col>
                       </v-row>
                     </div>
@@ -237,6 +237,12 @@ defineExpose({
                   <div>
                     <h3 class="subHeading">EXPERIENCE</h3>
                     <v-divider></v-divider>
+                    <p v-if="experienceDetails?.length == 0" colspan="8" v-bind:style="{
+              'font-size': '14px',
+              'margin-left': '10px'
+            }">
+                      <i>FRESHER</i>
+                    </p>
                     <div class="contentWrap" v-for="(exp, expIndex) in experienceDetails" :key="expIndex">
                       <v-row>
                         <v-col>
@@ -247,8 +253,8 @@ defineExpose({
                         <v-col>
                           <p class="regularTextEnd">
                             {{
-              moment(exp?.startDate).format('YYYY-MM-DD') }} - {{
-              moment(exp?.endDate).format('YYYY-MM-DD') }}
+              moment(exp?.startDate).format('YYYY-MM-DD') }} - {{ exp?.endDate ?
+              moment(exp?.endDate).format('YYYY-MM-DD') : "On Going" }}
                           </p>
                         </v-col>
                       </v-row>
@@ -258,7 +264,7 @@ defineExpose({
                       </ul>
                     </div>
                   </div>
-                  <div>
+                  <div v-if="projectDetails?.length > 0">
                     <h3 class="subHeading">PROJECTS</h3>
                     <v-divider></v-divider>
                     <div class="contentWrap" v-for="(project, pIndex) in projectDetails" :key="pIndex">
@@ -271,8 +277,8 @@ defineExpose({
                         <v-col>
                           <p class="regularTextEnd">
                             {{
-              moment(project?.startDate).format('YYYY-MM-DD') }} - {{
-              moment(project?.endDate).format('YYYY-MM-DD') }}
+              moment(project?.startDate).format('YYYY-MM-DD') }} - {{ project?.endDate ?
+              moment(project?.endDate).format('YYYY-MM-DD') : "On Going" }}
                           </p>
                         </v-col>
                       </v-row>
@@ -283,7 +289,7 @@ defineExpose({
                       </ul>
                     </div>
                   </div>
-                  <div>
+                  <div v-if="skillDetails?.length > 0">
                     <h3 class="subHeading">SKILLS</h3>
                     <v-divider></v-divider>
                     <div>
@@ -321,7 +327,7 @@ defineExpose({
                           <v-text-field v-model="education.degree" label="Degree*" required></v-text-field>
                         </v-col>
                         <v-col cols="6">
-                          <v-text-field v-model="education.course" label="Course"></v-text-field>
+                          <v-text-field v-model="education.course" label="Course*"></v-text-field>
                         </v-col>
                         <v-col cols="6">
                           <v-text-field v-model="education.gpa" label="Percentage/GPA*" required></v-text-field>
@@ -375,11 +381,11 @@ defineExpose({
                           <v-text-field v-model="exp.designation" label="Designation*" required></v-text-field>
                         </v-col>
                         <v-col cols="6">
-                          <v-select :items="['true', 'false']" label="Is Internship*" v-model="exp.isInternship"
+                          <v-select :items="['true', 'false']" label="Is Internship" v-model="exp.isInternship"
                             required></v-select>
                         </v-col>
                         <v-col cols="6">
-                          <v-select :items="['Full Time', 'Part Time']" label="Job Type*" v-model="exp.jobType"
+                          <v-select :items="['Full Time', 'Part Time']" label="Job Type" v-model="exp.jobType"
                             required></v-select>
                         </v-col>
                         <v-col cols="6">

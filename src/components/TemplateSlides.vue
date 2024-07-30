@@ -13,6 +13,7 @@ import ProfileServices from '../services/ProfileServices';
 import AskAI from './AskAI.vue';
 import html2pdf from "html2pdf.js";
 import html2canvas from 'html2canvas';
+import CommonServices from '../services/CommonServices';
 
 
 const route = useRoute();
@@ -30,6 +31,10 @@ const sampleResume1 = ref(null);
 const sampleResume2 = ref(null);
 const sampleResume3 = ref(null);
 const sampleResume4 = ref(null);
+const alert = ref({
+  show: false,
+  value: ""
+});
 
 const model = ref(0)
 onMounted(async () => {
@@ -111,36 +116,52 @@ async function getResumeById(resumeId) {
       }
     });
 }
+
+function closeAlert() {
+  alert.value = {
+    show: false,
+    value: ""
+  }
+}
+
 async function generateResume() {
   let payload = {
     ...templateRef.value.returnResumeContent(),
     templateType: model.value + 1
   };
-  await ResumeServices.addResume(userInfo.value.id, payload)
-    .then((response) => {
-      if (response.data.status == "Success") {
-        snackBar.value = {
-          value: true,
-          color: "green",
-          text: response.data?.message,
+  let checkMandatory = CommonServices.checkMandatoryFields(payload);
+  if (checkMandatory != "cool") {
+    alert.value = {
+      show: true,
+      value: checkMandatory
+    }
+  } else {
+    await ResumeServices.addResume(userInfo.value.id, payload)
+      .then((response) => {
+        if (response.data.status == "Success") {
+          snackBar.value = {
+            value: true,
+            color: "green",
+            text: response.data?.message,
+          }
+          router.push({ name: "resumes" });
+        } else {
+          snackBar.value = {
+            value: true,
+            color: "error",
+            text: response.data?.message,
+          }
         }
-        router.push({ name: "resumes" });
-      } else {
+      })
+      .catch((error) => {
+        console.log(error);
         snackBar.value = {
           value: true,
           color: "error",
-          text: response.data?.message,
+          text: error.response.data.message,
         }
-      }
-    })
-    .catch((error) => {
-      console.log(error);
-      snackBar.value = {
-        value: true,
-        color: "error",
-        text: error.response.data.message,
-      }
-    });
+      });
+  }
 }
 
 function checkJob() {
@@ -246,6 +267,14 @@ const downloadPDF = async () => {
   </v-row>
   <AskAI v-if="resumePreview == true && isCheckJob" :isCheckJob="isCheckJob" :closeCheckJob="closeCheckJob"
     :resumeId="resumeId" />
+  <v-snackbar v-model="alert.show" :timeout="4000" color="#D53737" elevation="24">
+    <b>{{ alert.value }}</b> is Mandatory to Add Resume...
+    <template v-slot:actions>
+      <v-btn variant="text" @click="closeAlert">
+        Close
+      </v-btn>
+    </template>
+  </v-snackbar>
 </template>
 <style scoped>
 html,
