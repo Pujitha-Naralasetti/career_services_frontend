@@ -236,7 +236,7 @@ defineExpose({
                       </v-row>
                       <p class="regularText">{{ education?.degree }} in {{ education?.course }}</p>
                       <p class="regularText"><b>GPA/Percentage:</b> {{ education?.gpa }}</p>
-                      <ul v-if="education?.awards.length > 0">
+                      <ul v-if="education?.awards?.length > 0">
                         <p class="regularText"><b>Awards:</b></p>
                         <li v-for="award in education?.awards" class="regularTextPoints">{{ award }}</li>
                       </ul>

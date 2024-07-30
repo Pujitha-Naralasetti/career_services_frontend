@@ -24,13 +24,14 @@ const modelSelected = ref(false);
 const templateRef = ref(null);
 const resumeId = ref(null);
 const isCheckJob = ref(false);
-const resumePreview = ref(false);
+const savedResume = ref(false);
 const resumeByRoute = ref(null);
 const fullProfile = ref(null);
 const sampleResume1 = ref(null);
 const sampleResume2 = ref(null);
 const sampleResume3 = ref(null);
 const sampleResume4 = ref(null);
+const accessType = ref("");
 const alert = ref({
   show: false,
   value: ""
@@ -39,8 +40,10 @@ const alert = ref({
 const model = ref(0)
 onMounted(async () => {
   if (route?.params?.id) {
+    const pathName = route.path.toLowerCase();
+    accessType.value = pathName.startsWith("/resume/view/") ? "preview" : "edit";
     resumeId.value = route?.params?.id;
-    resumePreview.value = true;
+    savedResume.value = true;
     await getResumeById(route?.params?.id);
   } else {
     await getFullProfile(userInfo.value?.id);
@@ -127,7 +130,8 @@ function closeAlert() {
 async function generateResume() {
   let payload = {
     ...templateRef.value.returnResumeContent(),
-    templateType: model.value + 1
+    templateType: model.value + 1,
+    id: resumeId.value
   };
   let checkMandatory = CommonServices.checkMandatoryFields(payload);
   if (checkMandatory != "cool") {
@@ -136,31 +140,59 @@ async function generateResume() {
       value: checkMandatory
     }
   } else {
-    await ResumeServices.addResume(userInfo.value.id, payload)
-      .then((response) => {
-        if (response.data.status == "Success") {
-          snackBar.value = {
-            value: true,
-            color: "green",
-            text: response.data?.message,
+    if (savedResume.value && accessType.value == 'edit') {
+      await ResumeServices.updateResume(resumeId.value, payload)
+        .then((response) => {
+          if (response.data.status == "Success") {
+            snackBar.value = {
+              value: true,
+              color: "green",
+              text: response.data?.message,
+            }
+            router.push({ name: "resumes" });
+          } else {
+            snackBar.value = {
+              value: true,
+              color: "error",
+              text: response.data?.message,
+            }
           }
-          router.push({ name: "resumes" });
-        } else {
+        })
+        .catch((error) => {
+          console.log(error);
           snackBar.value = {
             value: true,
             color: "error",
-            text: response.data?.message,
+            text: error.response.data.message,
           }
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-        snackBar.value = {
-          value: true,
-          color: "error",
-          text: error.response.data.message,
-        }
-      });
+        });
+    } else {
+      await ResumeServices.addResume(userInfo.value.id, payload)
+        .then((response) => {
+          if (response.data.status == "Success") {
+            snackBar.value = {
+              value: true,
+              color: "green",
+              text: response.data?.message,
+            }
+            router.push({ name: "resumes" });
+          } else {
+            snackBar.value = {
+              value: true,
+              color: "error",
+              text: response.data?.message,
+            }
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          snackBar.value = {
+            value: true,
+            color: "error",
+            text: error.response.data.message,
+          }
+        });
+    }
   }
 }
 
@@ -194,7 +226,7 @@ const downloadPDF = async () => {
 
 </script>
 <template>
-  <div v-if="modelSelected == false && resumePreview == false">
+  <div v-if="modelSelected == false && savedResume == false">
     <div class="d-flex justify-space-around align-center py-4">
       <v-btn icon="mdi-minus" variant="text" @click="model = Math.max(model - 1, 0)" dark></v-btn>
       {{ model + 1 }}
@@ -228,7 +260,7 @@ const downloadPDF = async () => {
       </v-carousel-item>
     </v-carousel>
   </div>
-  <div v-else-if="modelSelected == true && resumePreview == false">
+  <div v-else-if="modelSelected == true && savedResume == false">
     <Template1 type="edit" :generateResume="generateResume" :fullProfile="fullProfile" :isSlide="true"
       :resume="sampleResume1" ref="templateRef" v-if="model == 0 && fullProfile && sampleResume1" />
     <Template2 type="edit" :generateResume="generateResume" :fullProfile="fullProfile" :isSlide="true"
@@ -238,25 +270,35 @@ const downloadPDF = async () => {
     <Template4 type="edit" :generateResume="generateResume" :fullProfile="fullProfile" :isSlide="true"
       :resume="sampleResume4" ref="templateRef" v-else-if="model == 3 && fullProfile && sampleResume4" />
   </div>
-  <div v-else-if="resumePreview == true">
+  <div v-else-if="savedResume == true">
     <v-row class="mt-3 mb-3 mr-10">
       <v-col align="end">
         <v-btn class="mr-3" variant="flat" color="secondary" :to="{ name: 'resumes' }">Back</v-btn>
-        <v-btn class="mr-3" v-if="userInfo?.roleId == 1" variant="flat" color="primary" @click="checkJob">Check Job
-          Compatibility</v-btn>
-        <v-btn variant="flat" color="primary" @click="downloadPDF">Download PDF<v-icon icon="mdi-download" end></v-icon>
-        </v-btn>
+        <template v-if="accessType == 'preview'">
+          <v-btn class="mr-3" v-if="userInfo?.roleId == 1" variant="flat" color="primary" @click="checkJob">Check Job
+            Compatibility</v-btn>
+          <v-btn variant="flat" color="primary" @click="downloadPDF">Download PDF<v-icon icon="mdi-download"
+              end></v-icon>
+          </v-btn>
+        </template>
+        <template v-else>
+          <v-btn variant="flat" color="primary" @click="generateResume()">Update
+            Resume</v-btn>
+        </template>
       </v-col>
     </v-row>
-    <div id="resume-container">
-      <Template1 type="preview" :resume="resumeByRoute" v-if="resumeByRoute?.templateType == 1" />
-      <Template2 type="preview" :resume="resumeByRoute" v-else-if="resumeByRoute?.templateType == 2" />
-      <Template3 type="preview" :resume="resumeByRoute" v-else-if="resumeByRoute?.templateType == 3" />
-      <Template4 type="preview" :resume="resumeByRoute" v-else-if="resumeByRoute?.templateType == 4" />
+    <div :id="accessType == 'preview' ? 'resume-container' : ''">
+      <Template1 :type="accessType" ref="templateRef" :resume="resumeByRoute" v-if="resumeByRoute?.templateType == 1" />
+      <Template2 :type="accessType" ref="templateRef" :resume="resumeByRoute"
+        v-else-if="resumeByRoute?.templateType == 2" />
+      <Template3 :type="accessType" ref="templateRef" :resume="resumeByRoute"
+        v-else-if="resumeByRoute?.templateType == 3" />
+      <Template4 :type="accessType" ref="templateRef" :resume="resumeByRoute"
+        v-else-if="resumeByRoute?.templateType == 4" />
     </div>
   </div>
 
-  <v-row v-if="modelSelected == true && resumePreview == false">
+  <v-row v-if="modelSelected == true && savedResume == false">
     <v-col class="d-flex flex-row-reverse">
       <div>
         <v-btn @click="modelSelected = false" color="#232323" class="mr-5">Back</v-btn>
@@ -265,7 +307,7 @@ const downloadPDF = async () => {
       </div>
     </v-col>
   </v-row>
-  <AskAI v-if="resumePreview == true && isCheckJob" :isCheckJob="isCheckJob" :closeCheckJob="closeCheckJob"
+  <AskAI v-if="savedResume == true && isCheckJob" :isCheckJob="isCheckJob" :closeCheckJob="closeCheckJob"
     :resumeId="resumeId" />
   <v-snackbar v-model="alert.show" :timeout="4000" color="#D53737" elevation="24">
     <b>{{ alert.value }}</b> is Mandatory to Add Resume...

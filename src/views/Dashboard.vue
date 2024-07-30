@@ -3,14 +3,37 @@ import { onMounted } from "vue";
 import { ref } from "vue";
 import { useGlobalStore } from "../stores/globalStore";
 import { storeToRefs } from "pinia";
+import ResumeServices from "../services/ResumeServices";
 
 const globalStore = useGlobalStore();
 const { snackBar, userInfo } = storeToRefs(globalStore);
-
-onMounted(async () => {
-  console.log(userInfo.value);
+const dashboardCounts = ref({
+  resumeCount: 0,
+  studentCount: 0,
 });
 
+onMounted(async () => {
+  await getDashboardDetails();
+});
+
+async function getDashboardDetails() {
+  let payload = {
+    roleId: userInfo.value.roleId,
+    userId: userInfo.value.id
+  }
+  await ResumeServices.getDashboardDetails(payload)
+    .then((response) => {
+      dashboardCounts.value = response.data?.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      snackBar.value = {
+        value: true,
+        color: "error",
+        text: error.response.data.message,
+      }
+    });
+}
 </script>
 
 <template>
@@ -21,9 +44,9 @@ onMounted(async () => {
       <v-row class="mt-10 gc-10" justify="center">
         <v-col cols="3">
           <v-card color="#232323" class="rounded-lg" max-width="600" dark>
-            <v-card-title>My Resumes</v-card-title>
+            <v-card-title>Resumes</v-card-title>
             <v-card-text>
-              Total Count: {{ 0 }}
+              Total Count: {{ dashboardCounts.resumeCount }}
             </v-card-text>
             <v-card-action>
               <v-row justify="end" class="mb-3 mr-3">

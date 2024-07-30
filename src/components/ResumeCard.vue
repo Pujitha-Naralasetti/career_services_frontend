@@ -70,12 +70,17 @@ function closeDeletePopup() {
         </v-col>
         <v-col class="d-flex justify-end">
           <template v-if="userInfo?.id !== null">
-            <router-link :to="{ name: 'resumeById', params: { id: props.resume.id } }">
-              <v-icon class="mr-3" size="small" icon="mdi-eye"></v-icon>
+            <router-link :to="{ name: 'resumeViewById', params: { id: props.resume?.id } }">
+              <v-icon class="mr-3" size="small" color="white" icon="mdi-eye"></v-icon>
             </router-link>
           </template>
-          <template v-if="userInfo?.id !== null">
-            <v-icon class="mr-3" size="small" icon="mdi-delete" @click="(e) => openDeletePopup(e)"></v-icon>
+          <template v-if="userInfo?.id !== null && userInfo?.roleId == 1">
+            <router-link :to="{ name: 'resumeEditById', params: { id: props.resume?.id } }">
+              <v-icon class="mr-3" size="small" color="white" icon="mdi-pencil"></v-icon>
+            </router-link>
+          </template>
+          <template v-if="userInfo?.id !== null && userInfo?.roleId == 1">
+            <v-icon class="mr-3" size="small" icon="mdi-delete" color="red" @click="(e) => openDeletePopup(e)"></v-icon>
           </template>
         </v-col>
       </v-row>
