@@ -550,7 +550,6 @@ body {
 }
 
 .resume {
-  width: 950px;
   margin: auto;
   margin-bottom: 30px;
   padding: 30px;

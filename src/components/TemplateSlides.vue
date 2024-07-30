@@ -11,6 +11,8 @@ import { useRoute, useRouter } from 'vue-router';
 import { onMounted } from 'vue';
 import ProfileServices from '../services/ProfileServices';
 import AskAI from './AskAI.vue';
+import html2pdf from "html2pdf.js";
+import html2canvas from 'html2canvas';
 
 
 const route = useRoute();
@@ -148,6 +150,27 @@ function checkJob() {
 function closeCheckJob() {
   isCheckJob.value = false;
 }
+
+const downloadPDF = async () => {
+  const element = document.getElementById("resume-container");
+
+  element.classList.add('print-friendly');
+
+  const opt = {
+    margin: 0,
+    filename: 'resume.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+  };
+
+  html2pdf().from(element).set(opt).save().finally(() => {
+    element.classList.remove('print-friendly');
+  });
+};
+
+
+
 </script>
 <template>
   <div v-if="modelSelected == false && resumePreview == false">
@@ -200,12 +223,16 @@ function closeCheckJob() {
         <v-btn class="mr-3" variant="flat" color="secondary" :to="{ name: 'resumes' }">Back</v-btn>
         <v-btn class="mr-3" v-if="userInfo?.roleId == 1" variant="flat" color="primary" @click="checkJob">Check Job
           Compatibility</v-btn>
+        <v-btn variant="flat" color="primary" @click="downloadPDF">Download PDF<v-icon icon="mdi-download" end></v-icon>
+        </v-btn>
       </v-col>
     </v-row>
-    <Template1 type="preview" :resume="resumeByRoute" v-if="resumeByRoute?.templateType == 1" />
-    <Template2 type="preview" :resume="resumeByRoute" v-else-if="resumeByRoute?.templateType == 2" />
-    <Template3 type="preview" :resume="resumeByRoute" v-else-if="resumeByRoute?.templateType == 3" />
-    <Template4 type="preview" :resume="resumeByRoute" v-else-if="resumeByRoute?.templateType == 4" />
+    <div id="resume-container">
+      <Template1 type="preview" :resume="resumeByRoute" v-if="resumeByRoute?.templateType == 1" />
+      <Template2 type="preview" :resume="resumeByRoute" v-else-if="resumeByRoute?.templateType == 2" />
+      <Template3 type="preview" :resume="resumeByRoute" v-else-if="resumeByRoute?.templateType == 3" />
+      <Template4 type="preview" :resume="resumeByRoute" v-else-if="resumeByRoute?.templateType == 4" />
+    </div>
   </div>
 
   <v-row v-if="modelSelected == true && resumePreview == false">
@@ -220,3 +247,26 @@ function closeCheckJob() {
   <AskAI v-if="resumePreview == true && isCheckJob" :isCheckJob="isCheckJob" :closeCheckJob="closeCheckJob"
     :resumeId="resumeId" />
 </template>
+<style scoped>
+html,
+body {
+  background-color: #232323;
+  margin: 0;
+  padding: 0;
+}
+
+#resume-container {
+  background-color: #232323;
+  padding: 20px;
+  width: 210mm;
+  box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
+  margin: 0 auto;
+  color: white;
+}
+
+.print-friendly,
+.print-friendly * {
+  background-color: transparent !important;
+  color: black !important;
+}
+</style>

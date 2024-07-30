@@ -100,87 +100,17 @@ const expPointName = ref("");
 const skillName = ref("");
 const languageName = ref("");
 const courseWorkName = ref("");
-const personalInfo = ref({
-  name: userInfo.value.firstName + " " + userInfo.value.lastName,
-  address: userInfo.value.address,
-  phone: userInfo.value.phone,
-  email: userInfo.value.email,
-  linkedIn: "https://www.linkedin.com/in/johndoe",
-});
-const summary = ref(
-  "Recent graduate with a degree in marketing seeking an entry-level position in digital marketing. Experienced in creating social media campaigns and analyzing data to drive engagement and sales."
-);
+const personalInfo = ref(null);
+const summary = ref("");
 
-const educationDetails = ref([{
-  institutionName: "Oklahoma Christian University",
-  degree: "Bachelor of Arts /Bachelor of Science",
-  course: "XX /B.B.A",
-  startDate: new Date(),
-  endDate: new Date(),
-  gpa: "3.8",
-  address: "Oklahoma City, OK",
-  awards: ['Pat on the back'],
-  courseWork: []
-}]);
+const educationDetails = ref([]);
 
-const awardDetails = ref([{
-  title: "Honor/Award/Organization",
-  issuedBy: '',
-  date: new Date(),
-  awardPoints: ["Action Verb, followed by criteria for selection or explanation of involvement"],
-}]);
+const awardDetails = ref([]);
 
-const experienceDetails = ref([{
-  company: 'Employer',
-  designation: 'Your Title',
-  isInternship: false,
-  jobType: 'Full Time',
-  startDate: new Date(),
-  endDate: new Date(),
-  address: 'City, State',
-  experiencePoints: [
-    "Accomplished {X} as measured by {Y}, by doing {Z}",
-    "Action + Project/Problem + Results = Accomplishment",
-    "Three bullet points is sufficient for the most relevant position."
-  ]
-},
-{
-  company: 'Employer',
-  designation: 'Your Title',
-  isInternship: false,
-  jobType: 'Full Time',
-  startDate: new Date(),
-  endDate: new Date(),
-  address: 'City, State',
-  experiencePoints: [
-    "Filed papers and organized 100+ employee documents a month to ensure compliance with employment law & successfully passed the annual audit all three years in the role.",
-    "Led a 5-person leadership team to increase student participation by 100% from 50 to 100 members by creating a stronger social media presence."
-  ]
-},
-{
-  company: 'Employer',
-  designation: 'Your Title',
-  isInternship: false,
-  jobType: 'Full Time',
-  startDate: new Date(),
-  endDate: new Date(),
-  address: 'City, State',
-  experiencePoints: [
-    "Developed concepts and designs for 10 clients, including consumer products, electronics, and enterprise technology, utilizing Adobe Photoshop and Illustrator.",
-    "Collaborated with the IT team to develop an online application submission and tracking system, reducing cost by 10%."
-  ]
-}
-]);
+const experienceDetails = ref([]);
 
-const skillDetails = ref([
-  "JavaScript (ES6+)",
-  "React",
-  "Node.js",
-  "Express.js",
-  "MongoDB",
-  "Git",
-]);
-const languageDetails = ref(["English (fluent)", "Spanish (conversational)"]);
+const skillDetails = ref([]);
+const languageDetails = ref([]);
 
 function addEducation() {
   educationDetails.value.push({
@@ -299,12 +229,13 @@ defineExpose({
               <v-row align="center" class="mt-5">
                 <div id="resume" class="resume">
                   <div class="header">
-                    <h1 class="mainHeading">{{ personalInfo.name }}</h1>
+                    <h1 class="mainHeading">{{ personalInfo?.name }}</h1>
                     <p :style="{
               'text-align': 'center',
-            }" class="contact-info">{{ personalInfo.address }} | {{ personalInfo.phone }} | {{ personalInfo.email }} |
+            }" class="contact-info">{{ personalInfo?.address }} | {{ personalInfo?.phone }} | {{ personalInfo?.email }}
+                      |
                       {{
-              personalInfo.linkedIn }}</p>
+              personalInfo?.linkedIn }}</p>
                   </div>
                   <div>
                     <h3 class="subHeading">OBJECTIVE</h3>
@@ -324,8 +255,8 @@ defineExpose({
                         <v-col>
                           <p class="regularTextEnd">
                             {{
-              moment(education.startDate).format('YYYY-MM-DD') }} - {{
-              moment(education.endDate).format('YYYY-MM-DD') }}
+              moment(education?.startDate).format('YYYY-MM-DD') }} - {{
+              moment(education?.endDate).format('YYYY-MM-DD') }}
                           </p>
                         </v-col>
                       </v-row>
@@ -356,7 +287,7 @@ defineExpose({
                         </v-col>
                       </v-row>
                       <p class="regularText">{{ exp?.designation }}</p>
-                      <ul v-if="exp?.experiencePoints.length > 0">
+                      <ul v-if="exp?.experiencePoints?.length > 0">
                         <li v-for="expPoint in exp?.experiencePoints" class="regularTextPoints">{{ expPoint }}</li>
                       </ul>
                     </div>
@@ -378,7 +309,7 @@ defineExpose({
                           </p>
                         </v-col>
                       </v-row>
-                      <ul v-if="award?.awardPoints.length > 0">
+                      <ul v-if="award?.awardPoints?.length > 0">
                         <li v-for="awardPoint in award?.awardPoints" class="regularTextPoints">{{ awardPoint }}</li>
                       </ul>
                     </div>
@@ -388,13 +319,13 @@ defineExpose({
                     <v-divider></v-divider>
                     <div>
                       <p class="regularText"><b>Hard skills or Computer Skills:</b></p>
-                      <ul v-if="skillDetails.length > 0">
+                      <ul v-if="skillDetails?.length > 0">
                         <li v-for="skill in skillDetails" class="regularTextPoints">{{ skill }}</li>
                       </ul>
                     </div>
                     <div>
                       <p class="regularText"><b>Language Skills:</b></p>
-                      <ul v-if="languageDetails.length > 0">
+                      <ul v-if="languageDetails?.length > 0">
                         <li v-for="language in languageDetails" class="regularTextPoints">{{ language }}</li>
                       </ul>
                     </div>
@@ -681,7 +612,6 @@ body {
 }
 
 .resume {
-  width: 950px;
   margin: auto;
   margin-bottom: 30px;
   padding: 30px;
