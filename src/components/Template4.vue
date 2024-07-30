@@ -32,7 +32,6 @@ onMounted(async () => {
     if (props.fullProfile?.educationDetails?.length > 0) {
       let educationDetailsTemp = [];
       props.fullProfile?.educationDetails.map(item => {
-        item.awards = [];
         item.courseWork = [];
         educationDetailsTemp.push(item);
       })
@@ -51,20 +50,67 @@ onMounted(async () => {
     } else {
       experienceDetails.value = JSON.parse(props.resume?.experience);
     }
+
+    if (props.fullProfile?.awards?.length > 0) {
+      let awardDetailsTemp = [];
+      props.fullProfile?.awards.map(item => {
+        item.awardPoints = [];
+        awardDetailsTemp.push(item);
+      })
+      awardDetails.value = awardDetailsTemp;
+    } else {
+      awardDetails.value = JSON.parse(props.resume?.awards);
+    }
+
+    if (props.fullProfile?.skillDetails?.length > 0) {
+      let skillDetailsTemp = [];
+      props.fullProfile?.skillDetails.map(item => {
+        skillDetailsTemp.push(item?.name);
+      })
+      skillDetails.value = skillDetailsTemp;
+    } else {
+      let totalSkills = JSON.parse(props.resume?.skills);
+      skillDetails.value = totalSkills?.hardSkills;
+    }
+
+    if (props.fullProfile?.languageDetails?.length > 0) {
+      let languageDetailsTemp = [];
+      props.fullProfile?.languageDetails.map(item => {
+        languageDetailsTemp.push(item?.name);
+      })
+      languageDetails.value = languageDetailsTemp;
+    } else {
+      let totalSkills = JSON.parse(props.resume?.skills);
+      languageDetails.value = totalSkills?.languageSkills;
+    }
   } else if (props.resume) {
     summary.value = props.resume?.profileSummary;
     personalInfo.value = JSON.parse(props.resume?.personalInfo);
     educationDetails.value = JSON.parse(props.resume?.education);
+    awardDetails.value = JSON.parse(props.resume?.awards);
     experienceDetails.value = JSON.parse(props.resume?.experience);
+    let totalSkills = JSON.parse(props.resume?.skills);
+    skillDetails.value = totalSkills?.hardSkills;
+    languageDetails.value = totalSkills?.languageSkills;
   }
 });
+
+const awardPointName = ref("");
 const expPointName = ref("");
+const skillName = ref("");
+const languageName = ref("");
+const courseWorkName = ref("");
 const personalInfo = ref(null);
 const summary = ref("");
 
 const educationDetails = ref([]);
 
+const awardDetails = ref([]);
+
 const experienceDetails = ref([]);
+
+const skillDetails = ref([]);
+const languageDetails = ref([]);
 
 function addEducation() {
   educationDetails.value.push({
@@ -75,11 +121,22 @@ function addEducation() {
     endDate: null,
     gpa: "",
     address: "",
+    awards: [],
+    courseWork: []
   });
 }
 
 function deleteEducation(index) {
   educationDetails.value.splice(index, 1);
+}
+
+function addCourseWork(educationIndex, courseWork) {
+  educationDetails.value[educationIndex].courseWork.push(courseWork);
+  courseWorkName.value = "";
+}
+
+function deleteCourseWork(educationIndex, courseWork) {
+  educationDetails.value[educationIndex].courseWork.splice(courseWork, 1);
 }
 
 function addExpPoints(expIndex, pointName) {
@@ -108,13 +165,54 @@ function deleteExperience(index) {
   experienceDetails.value.splice(index, 1);
 }
 
+function addAwardPoints(awardIndex, pointName) {
+  awardDetails.value[awardIndex].awardPoints.push(pointName);
+  awardPointName.value = "";
+}
+
+function deleteAwardPoint(awardIndex, pointIndex) {
+  awardDetails.value[awardIndex].awardPoints.splice(pointIndex, 1);
+}
+
+function addAward() {
+  awardDetails.value.push({
+    title: "",
+    date: null,
+    awardPoints: [],
+  });
+}
+
+function deleteAward(index) {
+  awardDetails.value.splice(index, 1);
+}
+
+function addSkills(skill) {
+  skillDetails.value.push(skill);
+  skillName.value = "";
+}
+
+function deleteSkills(index) {
+  skillDetails.value.splice(index, 1);
+}
+
+function addLanguages(language) {
+  languageDetails.value.push(language);
+  languageName.value = "";
+}
+
+function deleteLanguages(index) {
+  languageDetails.value.splice(index, 1);
+}
+
 function returnResumeContent() {
   return {
     profileSummary: summary.value,
     userId: userInfo.value.id,
     personalInfo: JSON.stringify(personalInfo.value),
     education: JSON.stringify(educationDetails.value),
+    awards: JSON.stringify(awardDetails.value),
     experience: JSON.stringify(experienceDetails.value),
+    skills: JSON.stringify({ hardSkills: skillDetails.value, languageSkills: languageDetails.value }),
   }
 }
 defineExpose({
@@ -131,8 +229,9 @@ defineExpose({
               <v-row align="center" class="mt-5">
                 <div id="resume" class="resume">
                   <div class="header">
-                    <h1>{{ personalInfo?.name }}</h1>
+                    <h1 class="mainHeading">{{ personalInfo?.name }}</h1>
                     <p :style="{
+              'text-align': 'center',
             }" class="contact-info">{{ personalInfo?.address }} | {{ personalInfo?.phone }} | {{ personalInfo?.email }}
                       |
                       {{
@@ -147,17 +246,30 @@ defineExpose({
                     <h3 class="subHeading">EDUCATION</h3>
                     <v-divider></v-divider>
                     <div class="contentWrap" v-for="(education, eIndex) in educationDetails" :key="eIndex">
-                      <p class="regularText">
-                        <b>{{ education?.institutionName }},</b> {{ education?.address }} | {{
+                      <v-row>
+                        <v-col>
+                          <p class="regularText">
+                            <b>{{ education?.institutionName }},</b> {{ education?.address }}
+                          </p>
+                        </v-col>
+                        <v-col>
+                          <p class="regularTextEnd">
+                            {{
               moment(education?.startDate).format('YYYY-MM-DD') }} - {{ education?.endDate ?
               moment(education?.endDate).format('YYYY-MM-DD') : "On Going" }}
-                      </p>
+                          </p>
+                        </v-col>
+                      </v-row>
                       <p class="regularText">{{ education?.degree }} in {{ education?.course }}</p>
                       <p class="regularText"><b>GPA/Percentage:</b> {{ education?.gpa }}</p>
+                      <ul v-if="education?.courseWork?.length > 0">
+                        <p class="regularText"><b>Coursework:</b></p>
+                        <li v-for="course in education?.courseWork" class="regularTextPoints">{{ course }}</li>
+                      </ul>
                     </div>
                   </div>
                   <div>
-                    <h3 class="subHeading">EXPERIENCE</h3>
+                    <h3 class="subHeading">WORK EXPERIENCE (or LEADERSHIP, ACTIVITIES, VOLUNTEER WORK)</h3>
                     <v-divider></v-divider>
                     <p v-if="experienceDetails?.length == 0" colspan="8" v-bind:style="{
               'font-size': '14px',
@@ -166,14 +278,61 @@ defineExpose({
                       <i>FRESHER</i>
                     </p>
                     <div class="contentWrap" v-for="(exp, expIndex) in experienceDetails" :key="expIndex">
-                      <p class="regularText">
-                        <b>{{ exp?.designation }},</b> {{ exp?.company }} |
-                        {{
+                      <v-row>
+                        <v-col>
+                          <p class="regularText">
+                            <b>{{ exp?.company }}</b>
+                          </p>
+                        </v-col>
+                        <v-col>
+                          <p class="regularTextEnd">
+                            {{
               moment(exp?.startDate).format('YYYY-MM-DD') }} - {{ exp?.endDate ?
               moment(exp?.endDate).format('YYYY-MM-DD') : "On Going" }}
-                      </p>
-                      <ul v-if="exp?.experiencePoints.length > 0">
+                          </p>
+                        </v-col>
+                      </v-row>
+                      <p class="regularText">{{ exp?.designation }}</p>
+                      <ul v-if="exp?.experiencePoints?.length > 0">
                         <li v-for="expPoint in exp?.experiencePoints" class="regularTextPoints">{{ expPoint }}</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div v-if="awardDetails?.length > 0">
+                    <h3 class="subHeading">HONORS (and/or AWARDS)</h3>
+                    <v-divider></v-divider>
+                    <div class="contentWrap" v-for="(award, awardIndex) in awardDetails" :key="awardIndex">
+                      <v-row>
+                        <v-col>
+                          <p class="regularText">
+                            <b>{{ award?.title }}</b>
+                          </p>
+                        </v-col>
+                        <v-col>
+                          <p class="regularTextEnd">
+                            {{
+              moment(award?.date).format('YYYY-MM-DD') }}
+                          </p>
+                        </v-col>
+                      </v-row>
+                      <ul v-if="award?.awardPoints?.length > 0">
+                        <li v-for="awardPoint in award?.awardPoints" class="regularTextPoints">{{ awardPoint }}</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div v-if="skillDetails?.length > 0 || languageDetails?.length > 0">
+                    <h3 class="subHeading">SKILLS</h3>
+                    <v-divider></v-divider>
+                    <div v-if="skillDetails?.length > 0">
+                      <p class="regularText"><b>Hard skills or Computer Skills:</b></p>
+                      <ul>
+                        <li v-for="skill in skillDetails" class="regularTextPoints">{{ skill }}</li>
+                      </ul>
+                    </div>
+                    <div v-if="languageDetails?.length > 0">
+                      <p class="regularText"><b>Language Skills:</b></p>
+                      <ul>
+                        <li v-for="language in languageDetails" class="regularTextPoints">{{ language }}</li>
                       </ul>
                     </div>
                   </div>
@@ -223,6 +382,24 @@ defineExpose({
                         </v-col>
                         <v-col cols="6">
                           <v-textarea v-model="education.address" label="Address*" rows="3" outlined></v-textarea>
+                        </v-col>
+                        <v-col cols="12">
+                          <b>Course Work:</b>
+                          <template v-for="(cw, cwIndex) in education.courseWork" :key="cwIndex">
+                            <v-chip class="ma-2" label>{{ cw }}
+                              <v-icon end icon="mdi-close-circle" @click="deleteCourseWork(eIndex, cwIndex)"></v-icon>
+                            </v-chip>
+                          </template>
+                          <v-row justify="center" align="center" class="mt-3">
+                            <v-col cols="4">
+                              <v-text-field v-model="courseWorkName" label="Enter Course Work..."
+                                @keydown.enter="addCourseWork(eIndex, courseWorkName)"></v-text-field>
+                            </v-col>
+                            <v-col cols="4">
+                              <v-btn icon="mdi-plus" @click="addCourseWork(eIndex, courseWorkName)" color="#232323">
+                              </v-btn>
+                            </v-col>
+                          </v-row>
                         </v-col>
                       </v-row>
                     </v-col>
@@ -315,6 +492,113 @@ defineExpose({
                       <v-icon left>mdi-plus</v-icon>
                       Add New
                     </v-btn>
+                  </v-row>
+                </v-col>
+                <v-col cols="12">
+                  <h3 class="subHeading">AWARDS/HONORS:</h3>
+                  <p v-if="awardDetails?.length == 0" colspan="8" v-bind:style="{
+              color: '#707070',
+              'font-size': '14px',
+              textAlign: 'center',
+            }">
+                    No data available. Click on Add New to insert data...
+                  </p>
+                  <v-row v-for="(award, awardIndex) in awardDetails" :key="awardIndex" align="center">
+                    <v-col cols="11">
+                      <v-row align="center">
+                        <v-col cols="6">
+                          <v-text-field v-model="award.title" label="Award/Honor Name*" required></v-text-field>
+                        </v-col>
+                        <v-col cols="6">
+                          <VueDatePicker v-model="award.date" :enable-time-picker="false" color="#232323"
+                            placeholder="Received date*" dark>
+                          </VueDatePicker>
+                        </v-col>
+                        <v-col cols="12">
+                          <b>Award/Honor Details:</b>
+                          <template v-for="(point, pIndex) in award.awardPoints" :key="pIndex">
+                            <li class="regularTextPoints">
+                              <v-chip class="ma-2" :style="{ 'white-space': 'normal', 'height': 'auto' }" label>{{
+              point }}
+                                <v-icon end icon="mdi-close-circle"
+                                  @click="deleteAwardPoint(awardIndex, pIndex)"></v-icon>
+                              </v-chip>
+                            </li>
+                          </template>
+                          <v-row justify="center" align="center" class="mt-3">
+                            <v-col cols="6">
+                              <v-text-field v-model="awardPointName" label="Enter Award/Honor Details..."
+                                @keydown.enter="addAwardPoints(awardIndex, awardPointName)"></v-text-field>
+                            </v-col>
+                            <v-col cols="4">
+                              <v-btn icon="mdi-plus" @click="addAwardPoints(awardIndex, awardPointName)"
+                                color="#232323">
+                              </v-btn>
+                            </v-col>
+                          </v-row>
+                        </v-col>
+                      </v-row>
+                    </v-col>
+                    <v-col cols="1">
+                      <v-btn icon size="x-small" @click="deleteAward(awardIndex)" color="black">
+                        <v-icon color="red">mdi-delete</v-icon>
+                      </v-btn>
+                    </v-col>
+                    <v-divider v-if="awardIndex < awardDetails?.length - 1" class="mb-2"></v-divider>
+                  </v-row>
+                  <v-row justify="center" class="mt-3 mb-3">
+                    <v-btn @click="addAward" color="primary">
+                      <v-icon left>mdi-plus</v-icon>
+                      Add New
+                    </v-btn>
+                  </v-row>
+                </v-col>
+                <v-col cols="12">
+                  <h3 class="subHeading">SKILLS:</h3>
+                  <p v-if="skillDetails?.length == 0" colspan="8" v-bind:style="{
+              color: '#707070',
+              'font-size': '14px',
+              textAlign: 'center',
+            }">
+                    No data available. Click on Add New to insert data...
+                  </p>
+                  <v-row align="center">
+                    <v-col cols="12">
+                      <b>Hard skills or Computer Skills:</b>
+                      <template v-for="(skill, sIndex) in skillDetails" :key="sIndex">
+                        <v-chip class="ma-2" label>{{ skill }}
+                          <v-icon end icon="mdi-close-circle" @click="deleteSkills(sIndex)"></v-icon>
+                        </v-chip>
+                      </template>
+                      <v-row justify="center" align="center" class="mt-3">
+                        <v-col cols="4">
+                          <v-text-field v-model="skillName" label="Enter Award..."
+                            @keydown.enter="addSkills(skillName)"></v-text-field>
+                        </v-col>
+                        <v-col cols="4">
+                          <v-btn icon="mdi-plus" @click="addSkills(skillName)" color="#232323">
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+                    </v-col>
+                    <v-col cols="12">
+                      <b>Language Skills:</b>
+                      <template v-for="(language, lIndex) in languageDetails" :key="lIndex">
+                        <v-chip class="ma-2" label>{{ language }}
+                          <v-icon end icon="mdi-close-circle" @click="deleteLanguages(lIndex)"></v-icon>
+                        </v-chip>
+                      </template>
+                      <v-row justify="center" align="center" class="mt-3">
+                        <v-col cols="4">
+                          <v-text-field v-model="languageName" label="Enter Course Work..."
+                            @keydown.enter="addLanguages(languageName)"></v-text-field>
+                        </v-col>
+                        <v-col cols="4">
+                          <v-btn icon="mdi-plus" @click="addLanguages(languageName)" color="#232323">
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+                    </v-col>
                   </v-row>
                 </v-col>
               </v-row>
