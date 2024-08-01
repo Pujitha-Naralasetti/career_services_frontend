@@ -93,9 +93,34 @@ onMounted(async () => {
     } else {
       educationDetails.value = [];
     }
-    experienceDetails.value = [];
-    skillDetails.value = [];
-    languageDetails.value = [];
+    if (props.fullProfile?.experienceDetails?.length > 0) {
+      let experienceDetailsTemp = [];
+      props.fullProfile?.experienceDetails.map(item => {
+        item.experiencePoints = [];
+        experienceDetailsTemp.push(item);
+      })
+      experienceDetails.value = experienceDetailsTemp;
+    } else {
+      experienceDetails.value = [];
+    }
+    if (props.fullProfile?.skillDetails?.length > 0) {
+      let skillDetailsTemp = [];
+      props.fullProfile?.skillDetails.map(item => {
+        skillDetailsTemp.push(item?.name);
+      })
+      skillDetails.value = skillDetailsTemp;
+    } else {
+      skillDetails.value = [];
+    }
+    if (props.fullProfile?.languageDetails?.length > 0) {
+      let languageDetailsTemp = [];
+      props.fullProfile?.languageDetails.map(item => {
+        languageDetailsTemp.push(item?.name);
+      })
+      languageDetails.value = languageDetailsTemp;
+    } else {
+      languageDetails.value = [];
+    }
   } else if (props.resume) {
     summary.value = props.resume?.profileSummary;
     personalInfo.value = JSON.parse(props.resume?.personalInfo);
