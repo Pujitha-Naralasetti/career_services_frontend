@@ -19,7 +19,7 @@ const router = useRouter();
 const { snackBar, userInfo } = storeToRefs(globalStore);
 
 onMounted(async () => {
-  if (props.resume && props.isSlide) {
+  if (props.resume && props.isSlide && props.type == "preview") {
     summary.value = props.resume?.profileSummary;
     let link = "";
     if (props.fullProfile?.onlineProfileDetails?.length > 0) {
@@ -66,6 +66,19 @@ onMounted(async () => {
     } else {
       skillDetails.value = JSON.parse(props.resume?.skills);
     }
+  } else if (props.resume && props.isSlide && props.type == "edit") {
+    summary.value = "";
+    let link = "";
+    if (props.fullProfile?.onlineProfileDetails?.length > 0) {
+      link = props.fullProfile?.onlineProfileDetails[0]?.link;
+    } else {
+      link = JSON.parse(props.resume?.personalInfo)?.linkedIn;
+    }
+    personalInfo.value = props.fullProfile?.user ? { ...props.fullProfile?.user, name: props.fullProfile?.user?.firstName + " " + props.fullProfile?.user?.lastName, linkedIn: link } : JSON.parse(props.resume?.personalInfo);
+    educationDetails.value = [];
+    experienceDetails.value = [];
+    projectDetails.value = [];
+    skillDetails.value = [];
   } else if (props.resume) {
     summary.value = props.resume?.profileSummary;
     personalInfo.value = JSON.parse(props.resume?.personalInfo);
@@ -517,7 +530,7 @@ defineExpose({
               'font-size': '14px',
               textAlign: 'center',
             }">
-                    No data available. Click on Add New to insert data...
+                    No data available. Click on Plus icon to insert data...
                   </p>
                   <v-row align="center">
                     <v-col cols="12">
@@ -528,7 +541,7 @@ defineExpose({
                       </template>
                       <v-row justify="center" align="center" class="mt-3">
                         <v-col cols="4">
-                          <v-text-field v-model="skillName" label="Enter Award..."
+                          <v-text-field v-model="skillName" label="Enter Skill..."
                             @keydown.enter="addSkills(skillName)"></v-text-field>
                         </v-col>
                         <v-col cols="4">
