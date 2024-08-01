@@ -67,7 +67,7 @@ onMounted(async () => {
       skillDetails.value = JSON.parse(props.resume?.skills);
     }
   } else if (props.resume && props.isSlide && props.type == "edit") {
-    summary.value = "";
+    summary.value = props.resume?.profileSummary;
     let link = "";
     if (props.fullProfile?.onlineProfileDetails?.length > 0) {
       link = props.fullProfile?.onlineProfileDetails[0]?.link;

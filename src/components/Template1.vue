@@ -82,7 +82,17 @@ onMounted(async () => {
       link = JSON.parse(props.resume?.personalInfo)?.linkedIn;
     }
     personalInfo.value = props.fullProfile?.user ? { ...props.fullProfile?.user, name: props.fullProfile?.user?.firstName + " " + props.fullProfile?.user?.lastName, linkedIn: link } : JSON.parse(props.resume?.personalInfo);
-    educationDetails.value = [];
+    if (props.fullProfile?.educationDetails?.length > 0) {
+      let educationDetailsTemp = [];
+      props.fullProfile?.educationDetails.map(item => {
+        item.awards = [];
+        item.courseWork = [];
+        educationDetailsTemp.push(item);
+      })
+      educationDetails.value = educationDetailsTemp;
+    } else {
+      educationDetails.value = [];
+    }
     experienceDetails.value = [];
     skillDetails.value = [];
     languageDetails.value = [];
