@@ -74,7 +74,7 @@ onMounted(async () => {
       languageDetails.value = totalSkills?.languageSkills;
     }
   } else if (props.resume && props.isSlide && props.type == "edit") {
-    summary.value = "";
+    summary.value = props.resume?.profileSummary;
     let link = "";
     if (props.fullProfile?.onlineProfileDetails?.length > 0) {
       link = props.fullProfile?.onlineProfileDetails[0]?.link;
@@ -82,10 +82,45 @@ onMounted(async () => {
       link = JSON.parse(props.resume?.personalInfo)?.linkedIn;
     }
     personalInfo.value = props.fullProfile?.user ? { ...props.fullProfile?.user, name: props.fullProfile?.user?.firstName + " " + props.fullProfile?.user?.lastName, linkedIn: link } : JSON.parse(props.resume?.personalInfo);
-    educationDetails.value = [];
-    experienceDetails.value = [];
-    skillDetails.value = [];
-    languageDetails.value = [];
+    if (props.fullProfile?.educationDetails?.length > 0) {
+      let educationDetailsTemp = [];
+      props.fullProfile?.educationDetails.map(item => {
+        item.awards = [];
+        item.courseWork = [];
+        educationDetailsTemp.push(item);
+      })
+      educationDetails.value = educationDetailsTemp;
+    } else {
+      educationDetails.value = [];
+    }
+    if (props.fullProfile?.experienceDetails?.length > 0) {
+      let experienceDetailsTemp = [];
+      props.fullProfile?.experienceDetails.map(item => {
+        item.experiencePoints = [];
+        experienceDetailsTemp.push(item);
+      })
+      experienceDetails.value = experienceDetailsTemp;
+    } else {
+      experienceDetails.value = [];
+    }
+    if (props.fullProfile?.skillDetails?.length > 0) {
+      let skillDetailsTemp = [];
+      props.fullProfile?.skillDetails.map(item => {
+        skillDetailsTemp.push(item?.name);
+      })
+      skillDetails.value = skillDetailsTemp;
+    } else {
+      skillDetails.value = [];
+    }
+    if (props.fullProfile?.languageDetails?.length > 0) {
+      let languageDetailsTemp = [];
+      props.fullProfile?.languageDetails.map(item => {
+        languageDetailsTemp.push(item?.name);
+      })
+      languageDetails.value = languageDetailsTemp;
+    } else {
+      languageDetails.value = [];
+    }
   } else if (props.resume) {
     summary.value = props.resume?.profileSummary;
     personalInfo.value = JSON.parse(props.resume?.personalInfo);
