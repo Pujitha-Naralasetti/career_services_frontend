@@ -14,6 +14,7 @@ import AskAI from './AskAI.vue';
 import html2pdf from "html2pdf.js";
 import html2canvas from 'html2canvas';
 import CommonServices from '../services/CommonServices';
+import StaffFeedback from './StaffFeedback.vue';
 
 
 const route = useRoute();
@@ -22,6 +23,7 @@ const globalStore = useGlobalStore();
 const { snackBar, userInfo } = storeToRefs(globalStore);
 const modelSelected = ref(false);
 const templateRef = ref(null);
+const feedbackRef = ref(null);
 const resumeId = ref(null);
 const isCheckJob = ref(false);
 const savedResume = ref(false);
@@ -196,6 +198,46 @@ async function generateResume() {
   }
 }
 
+async function updateFeedback() {
+  let payload = {
+    resumeId: resumeId.value,
+    feedback: feedbackRef.value.returnFeedbackContent(),
+  };
+  let checkMandatory = CommonServices.checkFeedbackFields(payload.feedback);
+  if (checkMandatory != "cool") {
+    alert.value = {
+      show: true,
+      value: checkMandatory
+    }
+  } else {
+    await ResumeServices.updateFeedback(payload)
+      .then((response) => {
+        if (response.data.status == "Success") {
+          resumeByRoute.value.feedbacks = response.data?.data?.feedbacks;
+          snackBar.value = {
+            value: true,
+            color: "green",
+            text: response.data?.message,
+          }
+        } else {
+          snackBar.value = {
+            value: true,
+            color: "error",
+            text: response.data?.message,
+          }
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        snackBar.value = {
+          value: true,
+          color: "error",
+          text: error.response.data.message,
+        }
+      });
+  }
+}
+
 function checkJob() {
   isCheckJob.value = true;
 }
@@ -296,6 +338,17 @@ const downloadPDF = async () => {
       <Template4 :type="accessType" ref="templateRef" :resume="resumeByRoute"
         v-else-if="resumeByRoute?.templateType == 4" />
     </div>
+    <div v-if="accessType == 'preview'" class="feedback-container">
+      <StaffFeedback :resumeId="resumeId" ref="feedbackRef" :feedback="resumeByRoute.feedbacks" />
+      <v-row class="mt-5" v-if="userInfo.roleId == 2 || resumeByRoute.feedbacks?.length > 0">
+        <v-col class="d-flex flex-row-reverse">
+          <div>
+            <v-btn class="mr-3" variant="flat" color="secondary" :to="{ name: 'resumes' }">Back</v-btn>
+            <v-btn variant="flat" color="primary" @click="updateFeedback()">Update Feedback</v-btn>
+          </div>
+        </v-col>
+      </v-row>
+    </div>
   </div>
 
   <v-row v-if="modelSelected == true && savedResume == false">
@@ -310,7 +363,7 @@ const downloadPDF = async () => {
   <AskAI v-if="savedResume == true && isCheckJob" :isCheckJob="isCheckJob" :closeCheckJob="closeCheckJob"
     :resumeId="resumeId" />
   <v-snackbar v-model="alert.show" :timeout="4000" color="#D53737" elevation="24">
-    <b>{{ alert.value }}</b> is Mandatory to Add Resume...
+    <b>{{ alert.value }}</b> is Mandatory to Add/Update...
     <template v-slot:actions>
       <v-btn variant="text" @click="closeAlert">
         Close
@@ -326,13 +379,18 @@ body {
   padding: 0;
 }
 
-#resume-container {
+#resume-container,
+.feedback-container {
   background-color: #232323;
   padding: 20px;
   width: 210mm;
-  box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
+  /* box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5); */
   margin: 0 auto;
   color: white;
+}
+
+.feedback-container {
+  padding: 0px 30px 30px 30px;
 }
 
 .print-friendly,
