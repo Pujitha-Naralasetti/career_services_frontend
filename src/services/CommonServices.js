@@ -83,6 +83,15 @@ export default {
     return "cool";
   },
 
+  checkFeedbackFields(staffFeedbacks) {
+    for (let feedback of staffFeedbacks) {
+      if (!feedback.comments || feedback.comments?.trim() === "") {
+        return "Comments in Feedback";
+      }
+    }
+    return "cool";
+  },
+
   checkEducation(education) {
     for (let edu of education) {
       if (!edu.institutionName || edu.institutionName?.trim() === "") {

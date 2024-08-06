@@ -28,4 +28,7 @@ export default {
   getDashboardDetails(data) {
     return apiClient.post("dashboard/getDashboardDetails", data);
   },
+  updateFeedback(data) {
+    return apiClient.post("feedback/updateFeedback", data);
+  },
 };
