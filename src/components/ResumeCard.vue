@@ -63,8 +63,15 @@ function closeDeletePopup() {
     <v-card-title class="headline">
       <v-row align="center">
         <v-col>
-          <b>
-            Resume {{ props.resumeNumber + 1 }}</b>
+          <v-row>
+            <v-col>
+              <b>
+                Resume {{ props.resumeNumber + 1 }}
+              </b>
+            </v-col>
+            <v-col v-if="userInfo.roleId == 2">Student: <i>{{ JSON.parse(props.resume?.personalInfo)?.name
+                }}</i></v-col>
+          </v-row>
           <v-spacer></v-spacer>Template :
           {{ props.resume.templateType }}
         </v-col>
