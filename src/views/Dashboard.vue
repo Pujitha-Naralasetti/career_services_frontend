@@ -61,7 +61,7 @@ async function getDashboardDetails() {
           <v-card color="#232323" class="rounded-lg" max-width="600" dark>
             <v-card-title>My Profile</v-card-title>
             <v-card-text>
-              Student
+              {{ userInfo.roleId == 1 ? "Student" : "Staff" }}
             </v-card-text>
             <v-card-action>
               <v-row justify="end" class="mb-3 mr-3">
