@@ -46,10 +46,17 @@ onMounted(async () => {
       experienceDetails.value = JSON.parse(props.resume?.experience);
     }
 
-    if (props.fullProfile?.projects?.length > 0) {
+    if (props.fullProfile?.projectDetails?.length > 0) {
       let projectDetailsTemp = [];
-      props.fullProfile?.projects.map(item => {
-        item.projectPoints = [];
+      props.fullProfile?.projectDetails.map(item => {
+        item.title = item?.title;
+        item.company = item?.company;
+        item.role = "";
+        item.link = item?.link;
+        item.startDate = item?.startDate;
+        item.endDate = item?.endDate;
+        item.address = "";
+        item.projectPoints = item?.description ? [item?.description] : [];
         projectDetailsTemp.push(item);
       })
       projectDetails.value = projectDetailsTemp;
@@ -90,10 +97,17 @@ onMounted(async () => {
     } else {
       experienceDetails.value = [];
     }
-    if (props.fullProfile?.projects?.length > 0) {
+    if (props.fullProfile?.projectDetails?.length > 0) {
       let projectDetailsTemp = [];
-      props.fullProfile?.projects.map(item => {
-        item.projectPoints = [];
+      props.fullProfile?.projectDetails.map(item => {
+        item.title = item?.title;
+        item.company = item?.company;
+        item.role = "";
+        item.link = item?.link;
+        item.startDate = item?.startDate;
+        item.endDate = item?.endDate;
+        item.address = "";
+        item.projectPoints = item?.description ? [item?.description] : [];
         projectDetailsTemp.push(item);
       })
       projectDetails.value = projectDetailsTemp;
@@ -239,11 +253,12 @@ defineExpose({
                   <div class="header">
                     <h1 class="mainHeading">{{ personalInfo?.name }}</h1>
                     <p :style="{
-              'text-align': 'center',
-            }" class="contact-info">{{ personalInfo?.address }} | {{ personalInfo?.phone }} | {{ personalInfo?.email }}
+                      'text-align': 'center',
+                    }" class="contact-info">{{ personalInfo?.address }} | {{ personalInfo?.phone }} | {{
+                      personalInfo?.email }}
                       |
                       {{
-              personalInfo?.linkedIn }}</p>
+                        personalInfo?.linkedIn }}</p>
                   </div>
                   <v-divider></v-divider>
                   <div>
@@ -262,8 +277,8 @@ defineExpose({
                         <v-col>
                           <p class="regularTextEnd">
                             {{
-              moment(education?.startDate).format('YYYY-MM-DD') }} - {{ education?.endDate ?
-              moment(education?.endDate).format('YYYY-MM-DD') : "On Going" }}
+                              moment(education?.startDate).format('YYYY-MM-DD') }} - {{ education?.endDate ?
+                              moment(education?.endDate).format('YYYY-MM-DD') : "On Going" }}
                           </p>
                         </v-col>
                       </v-row>
@@ -281,9 +296,9 @@ defineExpose({
                     <h3 class="subHeading">EXPERIENCE</h3>
                     <v-divider></v-divider>
                     <p v-if="experienceDetails?.length == 0" colspan="8" v-bind:style="{
-              'font-size': '14px',
-              'margin-left': '10px'
-            }">
+                      'font-size': '14px',
+                      'margin-left': '10px'
+                    }">
                       <i>FRESHER</i>
                     </p>
                     <div class="contentWrap" v-for="(exp, expIndex) in experienceDetails" :key="expIndex">
@@ -296,8 +311,8 @@ defineExpose({
                         <v-col>
                           <p class="regularTextEnd">
                             {{
-              moment(exp?.startDate).format('YYYY-MM-DD') }} - {{ exp?.endDate ?
-              moment(exp?.endDate).format('YYYY-MM-DD') : "On Going" }}
+                              moment(exp?.startDate).format('YYYY-MM-DD') }} - {{ exp?.endDate ?
+                              moment(exp?.endDate).format('YYYY-MM-DD') : "On Going" }}
                           </p>
                         </v-col>
                       </v-row>
@@ -320,8 +335,8 @@ defineExpose({
                         <v-col>
                           <p class="regularTextEnd">
                             {{
-              moment(project?.startDate).format('YYYY-MM-DD') }} - {{ project?.endDate ?
-              moment(project?.endDate).format('YYYY-MM-DD') : "On Going" }}
+                              moment(project?.startDate).format('YYYY-MM-DD') }} - {{ project?.endDate ?
+                              moment(project?.endDate).format('YYYY-MM-DD') : "On Going" }}
                           </p>
                         </v-col>
                       </v-row>
@@ -353,10 +368,10 @@ defineExpose({
                 <v-col cols="12">
                   <h3 class="subHeading">EDUCATION:</h3>
                   <p v-if="educationDetails?.length == 0" colspan="8" v-bind:style="{
-              color: '#707070',
-              'font-size': '14px',
-              textAlign: 'center',
-            }">
+                    color: '#707070',
+                    'font-size': '14px',
+                    textAlign: 'center',
+                  }">
                     No data available. Click on Add New to insert data...
                   </p>
                   <v-row v-for="(education, eIndex) in educationDetails" :key="eIndex" align="center">
@@ -408,10 +423,10 @@ defineExpose({
                 <v-col cols="12">
                   <h3 class="subHeading">PROFESSIONAL EXPERIENCE:</h3>
                   <p v-if="experienceDetails?.length == 0" colspan="8" v-bind:style="{
-              color: '#707070',
-              'font-size': '14px',
-              textAlign: 'center',
-            }">
+                    color: '#707070',
+                    'font-size': '14px',
+                    textAlign: 'center',
+                  }">
                     No data available. Click on Add New to insert data...
                   </p>
                   <v-row v-for="(exp, expIndex) in experienceDetails" :key="expIndex" align="center">
@@ -449,7 +464,7 @@ defineExpose({
                           <template v-for="(point, pIndex) in exp.experiencePoints" :key="pIndex">
                             <li class="regularTextPoints">
                               <v-chip class="ma-2" :style="{ 'white-space': 'normal', 'height': 'auto' }" label>{{
-              point }}
+                                point }}
                                 <v-icon end icon="mdi-close-circle" @click="deleteExpPoint(expIndex, pIndex)"></v-icon>
                               </v-chip>
                             </li>
@@ -485,10 +500,10 @@ defineExpose({
                 <v-col cols="12">
                   <h3 class="subHeading">PROJECTS:</h3>
                   <p v-if="projectDetails?.length == 0" colspan="8" v-bind:style="{
-              color: '#707070',
-              'font-size': '14px',
-              textAlign: 'center',
-            }">
+                    color: '#707070',
+                    'font-size': '14px',
+                    textAlign: 'center',
+                  }">
                     No data available. Click on Add New to insert data...
                   </p>
                   <v-row v-for="(project, projectIndex) in projectDetails" :key="projectIndex" align="center">
@@ -518,7 +533,7 @@ defineExpose({
                           <template v-for="(point, pIndex) in project.projectPoints" :key="pIndex">
                             <li class="regularTextPoints">
                               <v-chip class="ma-2" :style="{ 'white-space': 'normal', 'height': 'auto' }" label>{{
-              point }}
+                                point }}
                                 <v-icon end icon="mdi-close-circle"
                                   @click="deleteProjectPoint(projectIndex, pIndex)"></v-icon>
                               </v-chip>
@@ -556,10 +571,10 @@ defineExpose({
                 <v-col cols="12">
                   <h3 class="subHeading">SKILLS:</h3>
                   <p v-if="skillDetails?.length == 0" colspan="8" v-bind:style="{
-              color: '#707070',
-              'font-size': '14px',
-              textAlign: 'center',
-            }">
+                    color: '#707070',
+                    'font-size': '14px',
+                    textAlign: 'center',
+                  }">
                     No data available. Click on Plus icon to insert data...
                   </p>
                   <v-row align="center">

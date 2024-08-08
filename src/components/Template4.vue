@@ -51,10 +51,12 @@ onMounted(async () => {
       experienceDetails.value = JSON.parse(props.resume?.experience);
     }
 
-    if (props.fullProfile?.awards?.length > 0) {
+    if (props.fullProfile?.awardsAndAchievements?.length > 0) {
       let awardDetailsTemp = [];
-      props.fullProfile?.awards.map(item => {
-        item.awardPoints = [];
+      props.fullProfile?.awardsAndAchievements.map(item => {
+        item.title = item?.title;
+        item.date = item?.date;
+        item.awardPoints = [item?.description];
         awardDetailsTemp.push(item);
       })
       awardDetails.value = awardDetailsTemp;
@@ -102,10 +104,12 @@ onMounted(async () => {
     } else {
       educationDetails.value = [];
     }
-    if (props.fullProfile?.awards?.length > 0) {
+    if (props.fullProfile?.awardsAndAchievements?.length > 0) {
       let awardDetailsTemp = [];
-      props.fullProfile?.awards.map(item => {
-        item.awardPoints = [];
+      props.fullProfile?.awardsAndAchievements.map(item => {
+        item.title = item?.title;
+        item.date = item?.date;
+        item.awardPoints = [item?.description];
         awardDetailsTemp.push(item);
       })
       awardDetails.value = awardDetailsTemp;
